@@ -1,6 +1,6 @@
 {
   "name": "taine-component",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -16,6 +16,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "flowbite-react": "^0.10.2",
     "next": "14.2.16",
     "npm": "^10.9.0",
     "react": "^18",
@@ -29,8 +30,8 @@
     "eslint-config-next": "14.2.16",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
     "tscpaths": "^0.0.9",
-    "tslib": "^2.6.2"
+    "tslib": "^2.6.2",
+    "typescript": "^5"
   }
 }
