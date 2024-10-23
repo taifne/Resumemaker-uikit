@@ -1,0 +1,16 @@
+image: node:21.4.0
+
+stages:
+  - build
+
+
+publish-npm:
+  stage: build
+  allow_failure: true
+  script:
+   
+    - yarn install
+    - npm publish
+  # only: 
+  #   - main
+  environment: production
