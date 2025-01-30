@@ -1,1 +1,0 @@
-export { ButtonWD } from "./component";

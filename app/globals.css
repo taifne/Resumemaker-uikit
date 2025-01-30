@@ -25,3 +25,141 @@ body {
     text-wrap: balance;
   }
 }
+/* Basic layout */
+.calendar-container {
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  max-width: 400px;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 20px;
+}
+
+/* Header style */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nav-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+  background-color: #e0e0e0;
+}
+
+.month-year {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Day names style */
+.day-name {
+  font-weight: bold;
+  padding: 10px;
+  background-color: #f7f7f7;
+  color: #333;
+}
+
+/* Calendar grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+/* Individual day styling */
+.calendar-day {
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.calendar-day:hover {
+  background-color: #e0e0e0;
+}
+
+.calendar-day.empty {
+  background-color: transparent;
+}
+
+.calendar-day.today {
+  background-color: #4caf50;
+  color: white;
+  font-weight: bold;
+}
+
+/* Add spacing between the calendar container and the rest of the page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f3f3;
+  margin: 0;
+  padding: 0;
+}
+/* Basic container for the tabs */
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Tabs styles */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  background-color: #f4f4f4;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.tab:hover {
+  background-color: #e0e0e0;
+}
+
+.tab.active {
+  border-bottom: 2px solid #4caf50;
+  background-color: #fff;
+  color: #4caf50;
+}
+
+/* Tab Panel styles */
+.tab-panels {
+  padding: 20px;
+}
+
+.tab-panel {
+  display: block;
+  font-size: 16px;
+  color: #333;
+}
+
+

@@ -28,6 +28,7 @@
     "npm": "^10.9.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-icons": "^5.4.0",
     "rollup": "^4.25.0",
     "rollup-plugin-dts": "^6.1.1",
     "rollup-plugin-peer-deps-external": "^2.2.4",
