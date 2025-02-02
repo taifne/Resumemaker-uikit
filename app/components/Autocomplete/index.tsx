@@ -1,110 +1,171 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 
-type AutocompleteProps = {
-  suggestions: string[];
-  onSelect: (selectedValue: string) => void;
+type SuggestionItem = {
+  label: string;
+  value: string;
 };
 
-const Autocomplete: React.FC<AutocompleteProps> = ({ suggestions, onSelect }) => {
+type AutocompleteProps = {
+  suggestions: SuggestionItem[];
+  onSelect: (selectedValue: string) => void;
+  placeholder?: string;
+  className?: string;
+  inputClassName?: string;
+  dropdownClassName?: string;
+  itemClassName?: string;
+  emptyText?: string;
+  debounceDelay?: number;
+};
+
+const Autocomplete: React.FC<AutocompleteProps> = React.memo(({
+  suggestions,
+  onSelect,
+  placeholder = 'Search...',
+  className = 'w-80',
+  inputClassName = '',
+  dropdownClassName = '',
+  itemClassName = '',
+  emptyText = 'No matches found',
+  debounceDelay = 300,
+}) => {
   const [query, setQuery] = useState('');
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
-  const [activeIndex, setActiveIndex] = useState<number>(-1);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLUListElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<NodeJS.Timeout>();
 
-  // Filter suggestions based on query
-  useEffect(() => {
-    if (query === '') {
-      setFilteredSuggestions([]);
-      setIsOpen(false);
-    } else {
-      const matches = suggestions.filter((suggestion) =>
-        suggestion.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredSuggestions(matches);
-      setIsOpen(matches.length > 0); // Open dropdown only if there are matches
-    }
+  // Memoized filtered suggestions
+  const filteredSuggestions = useMemo(() => {
+    if (!query) return [];
+    const lowerQuery = query.toLowerCase();
+    return suggestions.filter(({ label }) =>
+      label.toLowerCase().includes(lowerQuery)
+    );
   }, [query, suggestions]);
 
-  // Close dropdown if clicked outside
+  // Debounced input handling
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setQuery(value);
+      setActiveIndex(-1);
+      setIsOpen(!!value);
+    }, debounceDelay);
+  }, [debounceDelay]);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!isOpen) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setActiveIndex(prev => Math.min(prev + 1, filteredSuggestions.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setActiveIndex(prev => Math.max(prev - 1, 0));
+        break;
+      case 'Enter':
+        if (activeIndex >= 0) {
+          e.preventDefault();
+          handleSelect(filteredSuggestions[activeIndex].value);
+        }
+        break;
+      case 'Escape':
+        setIsOpen(false);
+        break;
+      case 'Tab':
+        setIsOpen(false);
+        break;
+    }
+  }, [activeIndex, filteredSuggestions, isOpen]);
+
+  // Suggestion selection
+  const handleSelect = useCallback((value: string) => {
+    const selected = suggestions.find(s => s.value === value);
+    if (selected) {
+      setQuery(selected.label);
+      onSelect(value);
+      setIsOpen(false);
+      inputRef.current?.blur();
+    }
+  }, [onSelect, suggestions]);
+
+  // Click outside handler
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        inputRef.current && !inputRef.current.contains(event.target as Node) &&
-        suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)
-      ) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(event.target.value);
-  };
-
-  const handleSelect = (value: string) => {
-    setQuery(value);
-    onSelect(value);
-    setIsOpen(false); // Close dropdown after selection
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'ArrowDown') {
-      setActiveIndex((prev) => Math.min(prev + 1, filteredSuggestions.length - 1));
-    } else if (event.key === 'ArrowUp') {
-      setActiveIndex((prev) => Math.max(prev - 1, 0));
-    } else if (event.key === 'Enter' && activeIndex >= 0) {
-      handleSelect(filteredSuggestions[activeIndex]);
-    } else if (event.key === 'Escape') {
-      setIsOpen(false);
+  // Scroll active item into view
+  useEffect(() => {
+    if (activeIndex >= 0 && containerRef.current) {
+      const activeItem = containerRef.current.querySelector(
+        `[data-index="${activeIndex}"]`
+      );
+      activeItem?.scrollIntoView({ block: 'nearest' });
     }
-  };
-
-  const handleSuggestionClick = (value: string) => {
-    handleSelect(value);
-  };
+  }, [activeIndex]);
 
   return (
-    <div className="relative w-80">
+    <div ref={containerRef} className={`relative ${className}`}>
       <input
         ref={inputRef}
         type="text"
         value={query}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition ease-in-out"
-        placeholder="Search..."
+        onClick={() => setIsOpen(!!query)}
+        aria-autocomplete="list"
+        aria-controls="autocomplete-list"
+        aria-expanded={isOpen}
+        aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+        className={`w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${inputClassName}`}
+        placeholder={placeholder}
+        role="combobox"
       />
 
-      {/* Dropdown Suggestions */}
-      {isOpen && filteredSuggestions.length > 0 && (
+      {isOpen && (
         <ul
-          ref={suggestionsRef}
-          className="absolute left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-auto transition-opacity ease-in-out duration-300"
+          id="autocomplete-list"
+          role="listbox"
+          className={`absolute left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-auto ${dropdownClassName}`}
         >
-          {filteredSuggestions.map((suggestion, index) => (
-            <li
-              key={suggestion}
-              onClick={() => handleSuggestionClick(suggestion)}
-              onMouseEnter={() => setActiveIndex(index)}
-              className={`p-3 cursor-pointer text-gray-700 hover:bg-blue-100 rounded-md ${
-                index === activeIndex ? 'bg-blue-500 text-white' : ''
-              }`}
-            >
-              {suggestion}
-            </li>
-          ))}
+          {filteredSuggestions.length > 0 ? (
+            filteredSuggestions.map(({ label, value }, index) => (
+              <li
+                key={value}
+                role="option"
+                data-index={index}
+                id={`option-${index}`}
+                aria-selected={index === activeIndex}
+                onClick={() => handleSelect(value)}
+                onMouseEnter={() => setActiveIndex(index)}
+                className={`p-3 cursor-pointer transition-colors ${
+                  index === activeIndex 
+                    ? 'bg-blue-500 text-white' 
+                    : 'text-gray-700 hover:bg-blue-100'
+                } ${itemClassName}`}
+              >
+                {label}
+              </li>
+            ))
+          ) : (
+            <li className="p-3 text-gray-500 italic">{emptyText}</li>
+          )}
         </ul>
       )}
     </div>
   );
-};
+});
 
 export default Autocomplete;

@@ -2,18 +2,68 @@ import React from 'react';
 
 type LoadingProps = {
   isLoading: boolean;
-  text?: string;  // Optional loading text
+  text?: string;
+  spinnerColor?: string;
+  textColor?: string;
+  overlayColor?: string;
+  overlayOpacity?: string;
+  backgroundColor?: string;
+  size?: 'sm' | 'md' | 'lg';
+  modalWidth?: string;
+  children?: React.ReactNode;
 };
 
-const Loading: React.FC<LoadingProps> = ({ isLoading, text }) => {
+const Loading: React.FC<LoadingProps> = ({
+  isLoading,
+  text,
+  spinnerColor = 'border-blue-500',
+  textColor = 'text-gray-800',
+  overlayColor = 'bg-gray-800',
+  overlayOpacity = 'bg-opacity-50',
+  backgroundColor = 'bg-white',
+  size = 'md',
+  modalWidth = 'w-80',
+  children,
+}) => {
   if (!isLoading) return null;
 
+  const sizeConfig = {
+    sm: {
+      spinner: 'w-12 h-12 border-4',
+      text: 'text-base',
+    },
+    md: {
+      spinner: 'w-20 h-20 border-6',
+      text: 'text-lg',
+    },
+    lg: {
+      spinner: 'w-24 h-24 border-8',
+      text: 'text-xl',
+    },
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-      <div className="flex flex-col items-center space-y-6 bg-white p-10 rounded-lg shadow-2xl w-80">
-        {/* Spinning + Scaling Animation */}
-        <div className="w-20 h-20 border-8 border-t-8 border-blue-500 border-solid rounded-full animate-spin-slow animate-scale-spin"></div>
-        {text && <p className="text-lg text-gray-800 font-semibold">{text}</p>}
+    <div 
+      className={`fixed inset-0 flex items-center justify-center z-50 ${overlayColor} ${overlayOpacity}`}
+      role="status"
+      aria-live="polite"
+    >
+      <div className={`flex flex-col items-center space-y-6 ${backgroundColor} p-8 rounded-xl shadow-2xl ${modalWidth}`}>
+        {children ? (
+          children
+        ) : (
+          <>
+            <div
+              className={`${sizeConfig[size].spinner} border-t-[5px] border-solid rounded-full 
+                animate-[spin_1.5s_linear_infinite,scalePulse_2s_ease-in-out_infinite] ${spinnerColor}`}
+            />
+            {text && (
+              <p className={`${sizeConfig[size].text} ${textColor} font-semibold animate-pulse`}>
+                {text}
+              </p>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

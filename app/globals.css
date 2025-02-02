@@ -163,3 +163,65 @@ body {
 }
 
 
+
+.resizer {  /* Improved styling for the resizer */
+    cursor: col-resize;
+    width: 2px; /* Make it slightly wider for easier grabbing */
+    background-color: #ccc; /* Or any other suitable color */
+    right: 0; /* Align to the right edge of the cell */
+    top: 0;
+    height: 100%;
+    position: absolute;  /* Absolutely positioned within the header cell */
+    z-index: 1; /* Ensure it's above other content */
+    transition: background-color 0.2s ease; /* Smooth hover effect */
+}
+
+.resizer:hover {
+    background-color: #666;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+ 
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes scalePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+ @keyframes fadeIn {
+   from { opacity: 0; }
+   to { opacity: 1; } }
+
+ @keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+   to { transform: translateY(0); opacity: 1; }
+}
+
+ @keyframes zoomIn {
+   from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideIn {
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-zoomIn {
+  animation: zoomIn 0.3s ease-in-out;
+}
+.calendar-day {
+  transition: all 0.2s ease-in-out;
+}
+
+.calendar-day:hover {
+  transform: scale(1.05);
+}

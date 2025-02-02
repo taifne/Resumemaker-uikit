@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 export interface BreadcrumbItem {
   label: string;
@@ -13,37 +13,54 @@ interface BreadcrumbProps {
   linkClass?: string;
   separatorClass?: string;
   activeClass?: string;
+  iconClass?: string;
+  LinkComponent?: React.ElementType;
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({
+const Breadcrumb: React.FC<BreadcrumbProps> = memo(({
   items,
   separator = "›",
   className = "flex items-center space-x-2 text-sm text-gray-600",
   linkClass = "text-blue-500 hover:text-blue-700",
   separatorClass = "mx-2 text-gray-400",
   activeClass = "font-semibold text-gray-800",
+  iconClass = "mr-1",
+  LinkComponent = "a",
 }) => {
   return (
-    <nav className={`py-3 ${className}`}>
+    <nav aria-label="Breadcrumb" className={`py-3 ${className}`}>
       <ul className="flex items-center">
-        {items.map((item, index) => (
-          <li key={index} className="flex items-center">
-            {item.icon && <span className="mr-1">{item.icon}</span>}
-            {item.link ? (
-              <a href={item.link} className={`${linkClass} text-sm`}>
+        {items.map((item, index) => {
+          const isLastItem = index === items.length - 1;
+          const Element = item.link && !isLastItem ? LinkComponent : "span";
+
+          return (
+            <li key={item.label} className="flex items-center">
+              {item.icon && (
+                <span className={`${iconClass}`}>{item.icon}</span>
+              )}
+              <Element
+                href={item.link}
+                className={`text-sm ${
+                  !isLastItem ? linkClass : activeClass
+                }`}
+              >
                 {item.label}
-              </a>
-            ) : (
-              <span className={`${activeClass} text-sm`}>{item.label}</span>
-            )}
-            {index < items.length - 1 && (
-              <span className={`${separatorClass} text-sm`}>{separator}</span>
-            )}
-          </li>
-        ))}
+              </Element>
+              {!isLastItem && (
+                <>
+                  <span className={`${separatorClass} text-sm`} aria-hidden="true">
+                    {separator}
+                  </span>
+                  <span className="sr-only">/</span>
+                </>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
-};
+});
 
 export default Breadcrumb;

@@ -1,71 +1,167 @@
 import React, { useState } from 'react';
+import clsx from 'clsx'; // For conditional classNames
 
-type PopupProps = {
+type PopupCommonProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  overlayColor?: string;
+  overlayOpacity?: string;
+  width?: string;
+  height?: string;
+  animation?: 'fade' | 'slide' | 'zoom';
+  closeButtonColor?: string;
+  closeButtonPosition?: 'top-right' | 'top-left' | 'bottom-center';
+  customCloseButton?: React.ReactNode;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+  borderRadius?: string;
+  shadow?: string;
 };
 
-type NestedPopupProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-};
-
-const NestedPopup: React.FC<NestedPopupProps> = ({ isOpen, onClose, children }) => {
+const BasePopup: React.FC<PopupCommonProps> = ({
+  isOpen,
+  onClose,
+  children,
+  overlayColor = 'black',
+  overlayOpacity = '50',
+  width = 'w-96',
+  height = 'min-h-[200px]',
+  animation = 'fade',
+  closeButtonColor = 'red-500',
+  closeButtonPosition = 'top-right',
+  customCloseButton,
+  header,
+  footer,
+  borderRadius = 'rounded-lg',
+  shadow = 'shadow-2xl',
+}) => {
   if (!isOpen) return null;
 
+  const animationClasses = {
+    fade: 'transition-opacity opacity-0 opacity-100',
+    slide: 'transform translate-y-[-50px] opacity-0 translate-y-0',
+    zoom: 'scale-50 opacity-0 scale-100',
+  };
+
+  const positionClasses = {
+    'top-right': 'top-3 right-3',
+    'top-left': 'top-3 left-3',
+    'bottom-center': 'bottom-3 left-1/2 transform -translate-x-1/2',
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
-      <div className="relative w-96 bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Nested Popup</h2>
+    <div 
+      className="fixed inset-0 flex items-center justify-center z-[9999]" 
+      role="dialog" 
+      aria-modal="true"
+    >
+      <div
+        className={clsx(
+          'absolute inset-0 bg-opacity-50',
+          `bg-${overlayColor}`,
+          `bg-opacity-${overlayOpacity}`,
+          'transition-opacity'
+        )}
+        onClick={onClose}
+        aria-label="Close popup"
+      />
+      
+      <div className={clsx(
+        'relative', 
+        width, 
+        height, 
+        borderRadius, 
+        shadow, 
+        'bg-white', 
+        animationClasses[animation],
+        'transition-all'
+      )}>
+        {/* Custom header or default */}
+        {header || (
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold">Popup Title</h2>
+          </div>
+        )}
+
+        {/* Close Button */}
+        {customCloseButton || (
+          <button
+            className={clsx(
+              'absolute', 
+              positionClasses[closeButtonPosition], 
+              `bg-${closeButtonColor}`, 
+              'text-white rounded-full w-8 h-8 flex items-center justify-center hover:scale-110 transition-transform'
+            )}
+            onClick={onClose}
+            aria-label="Close"
+          >
+            ✖
+          </button>
+        )}
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto max-h-[70vh]">
           {children}
         </div>
-        <button
-          className="absolute top-3 right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
-          onClick={onClose}
-        >
-          ✖
-        </button>
+
+        {/* Footer */}
+        {footer && (
+          <div className="p-4 border-t border-gray-200">
+            {footer}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
+type PopupProps = PopupCommonProps & {
+  showNestedButton?: boolean;
+  nestedPopupContent?: React.ReactNode;
+};
+
+const Popup: React.FC<PopupProps> = ({
+  showNestedButton = true,
+  nestedPopupContent,
+  isOpen,   // Do not pass `isOpen` to BasePopup from here
+  onClose,  // Do not pass `onClose` to BasePopup from here
+  ...props
+}) => {
   const [isNestedOpen, setNestedOpen] = useState(false);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
-      <div className="relative w-96 bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Main Popup</h2>
-          {children}
+    <>
+      <BasePopup 
+        {...props} // Pass other props, but don't pass isOpen and onClose directly
+        isOpen={isOpen} 
+        onClose={onClose}
+      >
+        {props.children}
+
+        {showNestedButton && (
           <button
-            className="mt-4 py-2 px-4 bg-blue-500 text-white rounded"
+            className="mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
             onClick={() => setNestedOpen(true)}
           >
             Open Nested Popup
           </button>
-        </div>
-        <button
-          className="absolute top-3 right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
-          onClick={onClose}
-        >
-          ✖
-        </button>
-      </div>
+        )}
+      </BasePopup>
 
-      {/* Nested Popup */}
-      <NestedPopup isOpen={isNestedOpen} onClose={() => setNestedOpen(false)}>
-        <p>This is a nested popup. You can put any content here!</p>
-      </NestedPopup>
-    </div>
+      {nestedPopupContent && (
+        <BasePopup
+          isOpen={isNestedOpen}
+          onClose={() => setNestedOpen(false)}
+          width="w-[600px]"
+          animation="slide"
+          overlayOpacity="70"
+          {...props}
+        >
+          {nestedPopupContent}
+        </BasePopup>
+      )}
+    </>
   );
 };
 

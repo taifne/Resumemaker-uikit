@@ -2,14 +2,95 @@
 import React from 'react';
 
 // Home Icon
-export const HomeIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-    <path d="M12 3l8 8-1.5 1.5L12 5l-6.5 6.5L4 11l8-8z" />
-    <path d="M12 13v8" />
-    <path d="M9 16h6" />
+export const HomeIcon: React.FC<React.SVGProps<SVGSVGElement> & { 
+  gradient?: boolean;
+  variant?: 'filled' | 'outline';
+}> = ({ gradient = false, variant = 'filled', ...props }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={`transition-transform duration-200 hover:scale-105 ${props.className || ''}`}
+    style={{
+      ...props.style,
+      ...(gradient && {
+        background: variant === 'filled' 
+          ? 'radial-gradient(circle at center, #fff 30%, #f5f5f5 100%)'
+          : undefined
+      })
+    }}
+    {...props}
+  >
+    {/* Gradient definition */}
+    {gradient && (
+      <defs>
+        <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FF6B6B" />
+          <stop offset="100%" stopColor="#FFD93D" />
+        </linearGradient>
+      </defs>
+    )}
+
+    {/* House structure */}
+    <path
+      d="M12 3L3 10h2v11h14V10h2L12 3z"
+      fill={variant === 'filled' ? (gradient ? "url(#homeGradient)" : "currentColor") : "none"}
+      stroke={variant === 'outline' ? "currentColor" : "none"}
+    />
+
+    {/* Door */}
+    <rect
+      x="10"
+      y="14"
+      width="4"
+      height="6"
+      rx="1"
+      fill={variant === 'filled' ? (gradient ? "#fff" : "currentColor") : "none"}
+      stroke={variant === 'outline' ? "currentColor" : "none"}
+    />
+
+    {/* Window */}
+    <rect
+      x="6"
+      y="8"
+      width="4"
+      height="4"
+      rx="1"
+      fill={variant === 'filled' ? (gradient ? "#fff" : "currentColor") : "none"}
+      stroke={variant === 'outline' ? "currentColor" : "none"}
+    />
+    <rect
+      x="14"
+      y="8"
+      width="4"
+      height="4"
+      rx="1"
+      fill={variant === 'filled' ? (gradient ? "#fff" : "currentColor") : "none"}
+      stroke={variant === 'outline' ? "currentColor" : "none"}
+    />
+
+    {/* Chimney */}
+    <path
+      d="M19 7h1v3h-1z"
+      fill={variant === 'filled' ? (gradient ? "#FF6B6B" : "currentColor") : "none"}
+      stroke={variant === 'outline' ? "currentColor" : "none"}
+    />
+
+    {/* Smoke */}
+    {variant === 'filled' && (
+      <path
+        d="M19 5c-1 0-2 .5-2 1.5 0-1-1-1.5-2-1.5"
+        stroke={gradient ? "#FFD93D" : "currentColor"}
+        strokeWidth="1"
+        opacity="0.8"
+      />
+    )}
   </svg>
 );
-
 // User Icon
 export const UserIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
@@ -276,23 +357,127 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   export const PopupSvg: React.FC = () => {
     return (
       <svg width="300" height="250" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="300" height="250" fill="rgba(0, 0, 0, 0.5)" opacity="0.3"/>
-        <rect x="30" y="50" width="240" height="150" rx="15" ry="15" fill="white" stroke="black" stroke-width="2">
-          <animate attributeName="rx" from="15" to="25" dur="2s" repeatCount="indefinite"/>
+        {/* Background Layer */}
+        <rect x="0" y="0" width="300" height="250" fill="rgba(0, 0, 0, 0.6)" />
+  
+        {/* Main Popup Box */}
+        <rect
+          x="30"
+          y="50"
+          width="240"
+          height="150"
+          rx="20"
+          ry="20"
+          fill="white"
+          stroke="#4CAF50"
+          strokeWidth="3"
+        >
+          <animate
+            attributeName="rx"
+            values="20;25;20"
+            dur="3s"
+            repeatCount="indefinite"
+          />
         </rect>
-        <rect x="30" y="50" width="240" height="30" rx="10" ry="10" fill="#4CAF50">
-          <animate attributeName="fill" values="#4CAF50;#8BC34A;#4CAF50" dur="2s" repeatCount="indefinite"/>
+  
+        {/* Popup Title Bar */}
+        <rect
+          x="30"
+          y="50"
+          width="240"
+          height="40"
+          rx="20"
+          ry="20"
+          fill="#4CAF50"
+        >
+          <animate
+            attributeName="fill"
+            values="#4CAF50;#8BC34A;#4CAF50"
+            dur="3s"
+            repeatCount="indefinite"
+          />
         </rect>
-        <text x="150" y="70" text-anchor="middle" font-size="16" fill="white">Popup Title</text>
-        <rect x="250" y="55" width="20" height="20" fill="white"/>
-        <line x1="250" y1="55" x2="270" y2="75" stroke="black" stroke-width="2"/>
-        <line x1="270" y1="55" x2="250" y2="75" stroke="black" stroke-width="2"/>
-        <rect x="30" y="80" width="240" height="120" rx="10" ry="10" fill="white"/>
-        <rect x="0" y="0" width="300" height="250" fill="rgba(255, 255, 255, 0.5)" opacity="0.5"/>
+        <text
+          x="150"
+          y="75"
+          textAnchor="middle"
+          fontSize="18"
+          fill="white"
+          fontFamily="Arial, sans-serif"
+          fontWeight="bold"
+        >
+          Popup Title
+        </text>
+  
+        {/* Close Button */}
+        <g transform="translate(250, 55)">
+          <rect width="20" height="20" rx="5" ry="5" fill="#FF5252" />
+          <line
+            x1="5"
+            y1="5"
+            x2="15"
+            y2="15"
+            stroke="white"
+            strokeWidth="2"
+          />
+          <line
+            x1="15"
+            y1="5"
+            x2="5"
+            y2="15"
+            stroke="white"
+            strokeWidth="2"
+          />
+        </g>
+  
+        {/* Content Area */}
+        <rect
+          x="40"
+          y="100"
+          width="220"
+          height="90"
+          rx="15"
+          ry="15"
+          fill="#F5F5F5"
+        />
+  
+        {/* Content Text */}
+        <text
+          x="150"
+          y="130"
+          textAnchor="middle"
+          fontSize="14"
+          fill="#333"
+          fontFamily="Arial, sans-serif"
+        >
+          This is a beautiful popup!
+        </text>
+        <text
+          x="150"
+          y="150"
+          textAnchor="middle"
+          fontSize="12"
+          fill="#666"
+          fontFamily="Arial, sans-serif"
+        >
+          You can add more content here.
+        </text>
+  
+        {/* Subtle Shadow Effect */}
+        <rect
+          x="30"
+          y="50"
+          width="240"
+          height="150"
+          rx="20"
+          ry="20"
+          fill="transparent"
+          stroke="rgba(0, 0, 0, 0.1)"
+          strokeWidth="10"
+        />
       </svg>
     );
   };
-  
   export const AutocompleteSvg: React.FC = () => {
     return (
       <svg width="250" height="60" xmlns="http://www.w3.org/2000/svg">

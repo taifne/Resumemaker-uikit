@@ -508,7 +508,21 @@ export default function Home() {
 
   return ( <div className="flex h-screen overflow-hidden">
    
-    <Sidebar items={sidebarItems} />
+   <Sidebar
+  items={sidebarItems}
+  theme={{
+    background: "bg-slate-900",
+    text: "text-slate-100",
+    activeBackground: "bg-indigo-600",
+    activeText: "text-white",
+    hoverBackground: "bg-slate-700",
+    border: "border-slate-700"
+  }}
+  expandedWidth="280px"
+  collapsedWidth="90px"
+  enableTouchGestures
+  customSubMenuIcon={<UserIcon />}
+/>
    
     <div className="flex-grow flex-column h-full overflow-auto">
      
@@ -525,60 +539,29 @@ export default function Home() {
           </Navbar>
         </div>
         <div className="flex flex-wrap justify-center gap-6 w-full mt-20">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
-            <Card title="TreeView" description="TreeView Component" linkUrl="#">
-              <TreeViewSvg />
-            </Card>
-            <Card title="Popup" description="Popup Component" linkUrl="#">
-              <PopupSvg />
-            </Card>
-            <Card
-              title="Autocomplete"
-              description="Autocomplete Component"
-              linkUrl="#"
-            >
-              <AutocompleteSvg />
-            </Card>
-            <Card title="Chart" description="Chart Component" linkUrl="#">
-              <ChartSvg />
-            </Card>
-            <Card title="Button" description="Button Component" linkUrl="#">
-              <ButtonSvg />
-            </Card>
-            <Card title="Drawer" description="Drawer Component" linkUrl="#">
-              <DrawerSvg />
-            </Card>
-            <Card title="Loading" description="Loading Component" linkUrl="#">
-              <LoadingSvg />
-              <LoadingSvg />
-              <LoadingSvg />
-            </Card>
-            <Card title="Toast" description="Toast Component" linkUrl="#">
-              <ToastSvg />
-            </Card>
-            <Card title="Card" description="Card Component" linkUrl="#">
-              <CardSVG />
-            </Card>
-            <Card title="Dropdown" description="Dropdown Component" linkUrl="#">
-              <DropdownSVG />
-            </Card>
-            <Card title="Stepper" description="Stepper Component" linkUrl="#">
-              <StepperSvg />
-            </Card>
-            <Card
-              title="Pagination"
-              description="Pagination Component"
-              linkUrl="#"
-            >
-              <PaginationSvg />
-            </Card>
-            <Card title="Tab" description="Tab Component" linkUrl="#">
-              <TabSvg />
-            </Card>
-            <Card title="Table" description="Table Component" linkUrl="#">
-              <TableSVG />
-            </Card>
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
+  {[
+    { title: "TreeView", description: "TreeView Component", icon: <TreeViewSvg /> },
+    { title: "Popup", description: "Popup Component", icon: <PopupSvg /> },
+    { title: "Autocomplete", description: "Autocomplete Component", icon: <AutocompleteSvg /> },
+    { title: "Chart", description: "Chart Component", icon: <ChartSvg /> },
+    { title: "Button", description: "Button Component", icon: <ButtonSvg /> },
+    { title: "Drawer", description: "Drawer Component", icon: <DrawerSvg /> },
+    { title: "Loading", description: "Loading Component", icon: <><LoadingSvg /><LoadingSvg /><LoadingSvg /></> },
+    { title: "Toast", description: "Toast Component", icon: <ToastSvg /> },
+    { title: "Card", description: "Card Component", icon: <CardSVG /> },
+    { title: "Dropdown", description: "Dropdown Component", icon: <DropdownSVG /> },
+    { title: "Stepper", description: "Stepper Component", icon: <StepperSvg /> },
+    { title: "Pagination", description: "Pagination Component", icon: <PaginationSvg /> },
+    { title: "Tab", description: "Tab Component", icon: <TabSvg /> },
+    { title: "Table", description: "Table Component", icon: <TableSVG /> },
+  ].map((item, index) => (
+    <Card key={index} title={item.title} description={item.description} linkUrl="#">
+      <div className="flex justify-center items-center h-16">{item.icon}</div>
+    </Card>
+  ))}
+</div>
+
         </div>
      
     </div>
