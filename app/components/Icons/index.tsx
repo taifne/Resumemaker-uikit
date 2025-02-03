@@ -304,77 +304,85 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   export const TableSVG: React.FC = () => {
     return (
       <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="10" width="280" height="180" rx="10" ry="10" fill="gray" opacity="0.1">
-          <animate attributeName="opacity" from="0.1" to="0.3" dur="2s" repeatCount="indefinite"/>
+        {/* Background rectangle with subtle animation */}
+        <rect x="10" y="10" width="280" height="180" rx="10" ry="10" fill="#f0f0f0" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="2s" repeatCount="indefinite" />
         </rect>
-        <rect x="10" y="10" width="280" height="180" rx="10" ry="10" stroke="black" stroke-width="1" fill="none"/>
-        <line x1="10" y1="60" x2="290" y2="60" stroke="black" stroke-width="1">
-          <animate attributeName="y1" from="60" to="80" dur="2s" repeatCount="indefinite"/>
+        <rect x="10" y="10" width="280" height="180" rx="10" ry="10" stroke="#ccc" strokeWidth="1" fill="none" />
+  
+        {/* Horizontal lines with subtle animation */}
+        <line x1="10" y1="60" x2="290" y2="60" stroke="#555" strokeWidth="1">
+          <animate attributeName="y1" from="60" to="70" dur="2s" repeatCount="indefinite" />
         </line>
-        <line x1="10" y1="110" x2="290" y2="110" stroke="black" stroke-width="1"/>
-        <line x1="10" y1="160" x2="290" y2="160" stroke="black" stroke-width="1"/>
-        <line x1="100" y1="10" x2="100" y2="190" stroke="black" stroke-width="1"/>
-        <line x1="200" y1="10" x2="200" y2="190" stroke="black" stroke-width="1"/>
-        <rect x="10" y="180" width="280" height="10" rx="5" ry="5" fill="gray" opacity="0.3"/>
+        <line x1="10" y1="110" x2="290" y2="110" stroke="#555" strokeWidth="1" />
+        <line x1="10" y1="160" x2="290" y2="160" stroke="#555" strokeWidth="1" />
+  
+        {/* Vertical lines */}
+        <line x1="100" y1="10" x2="100" y2="190" stroke="#555" strokeWidth="1" />
+        <line x1="200" y1="10" x2="200" y2="190" stroke="#555" strokeWidth="1" />
+  
+        {/* Bottom rectangle */}
+        <rect x="10" y="180" width="280" height="10" rx="5" ry="5" fill="#ccc" opacity="0.6" />
       </svg>
     );
   };
-  
   export const TreeViewSvg: React.FC = () => {
     return (
-      <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect x="10" y="10" width="280" height="180" rx="10" ry="10" fill="gray" opacity="0.1">
-          <animate attributeName="opacity" from="0.1" to="0.3" dur="2s" repeatCount="indefinite"/>
+      <svg width="300" height="150" xmlns="http://www.w3.org/2000/svg">
+        {/* Background rectangle with subtle animation */}
+        <rect x="10" y="10" width="280" height="130" rx="10" ry="10" fill="#f0f0f0" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="2s" repeatCount="indefinite" />
         </rect>
-        <rect x="10" y="10" width="280" height="180" rx="10" ry="10" stroke="black" stroke-width="1" fill="none"/>
-        <circle cx="50" cy="40" r="10" fill="black" opacity="0.5">
-          <animate attributeName="opacity" from="0.5" to="0.8" dur="1s" repeatCount="indefinite"/>
+        <rect x="10" y="10" width="280" height="130" rx="10" ry="10" stroke="#ccc" strokeWidth="1" fill="none" />
+  
+        {/* Left tree structure */}
+        <circle cx="50" cy="40" r="8" fill="#4CAF50" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
         </circle>
-        <circle cx="50" cy="70" r="10" fill="black" opacity="0.5">
-          <animate attributeName="opacity" from="0.5" to="0.8" dur="1s" repeatCount="indefinite"/>
+        <circle cx="50" cy="70" r="8" fill="#4CAF50" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
         </circle>
-        <circle cx="50" cy="100" r="10" fill="black" opacity="0.5">
-          <animate attributeName="opacity" from="0.5" to="0.8" dur="1s" repeatCount="indefinite"/>
+        <circle cx="50" cy="100" r="8" fill="#4CAF50" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
         </circle>
-        <circle cx="50" cy="130" r="10" fill="black" opacity="0.5">
-          <animate attributeName="opacity" from="0.5" to="0.8" dur="1s" repeatCount="indefinite"/>
+        <line x1="50" y1="40" x2="50" y2="70" stroke="#4CAF50" strokeWidth="2" />
+        <line x1="50" y1="70" x2="50" y2="100" stroke="#4CAF50" strokeWidth="2" />
+  
+        {/* Right tree structure */}
+        <circle cx="200" cy="40" r="8" fill="#2196F3" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
         </circle>
-        <line x1="50" y1="40" x2="50" y2="70" stroke="black" stroke-width="1"/>
-        <line x1="50" y1="70" x2="50" y2="100" stroke="black" stroke-width="1"/>
-        <line x1="50" y1="100" x2="50" y2="130" stroke="black" stroke-width="1"/>
-        <circle cx="200" cy="40" r="10" fill="black" opacity="0.5">
-          <animate attributeName="opacity" from="0.5" to="0.8" dur="1s" repeatCount="indefinite"/>
+        <circle cx="200" cy="70" r="8" fill="#2196F3" opacity="0.8">
+          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
         </circle>
-        <circle cx="200" cy="70" r="10" fill="black" opacity="0.5">
-          <animate attributeName="opacity" from="0.5" to="0.8" dur="1s" repeatCount="indefinite"/>
-        </circle>
-        <line x1="200" y1="40" x2="200" y2="70" stroke="black" stroke-width="1"/>
-        <rect x="10" y="180" width="280" height="10" rx="5" ry="5" fill="gray" opacity="0.3"/>
+        <line x1="200" y1="40" x2="200" y2="70" stroke="#2196F3" strokeWidth="2" />
+  
+        {/* Ground line */}
+        <rect x="10" y="120" width="280" height="10" rx="5" ry="5" fill="#ccc" opacity="0.6" />
       </svg>
     );
   };
-  
   export const PopupSvg: React.FC = () => {
     return (
-      <svg width="300" height="250" xmlns="http://www.w3.org/2000/svg">
+      <svg width="150" height="125" xmlns="http://www.w3.org/2000/svg">
         {/* Background Layer */}
-        <rect x="0" y="0" width="300" height="250" fill="rgba(0, 0, 0, 0.6)" />
+        <rect x="0" y="0" width="150" height="125" fill="rgba(0, 0, 0, 0.6)" />
   
         {/* Main Popup Box */}
         <rect
-          x="30"
-          y="50"
-          width="240"
-          height="150"
-          rx="20"
-          ry="20"
+          x="15"
+          y="25"
+          width="120"
+          height="75"
+          rx="10"
+          ry="10"
           fill="white"
           stroke="#4CAF50"
-          strokeWidth="3"
+          strokeWidth="2"
         >
           <animate
             attributeName="rx"
-            values="20;25;20"
+            values="10;12;10"
             dur="3s"
             repeatCount="indefinite"
           />
@@ -382,12 +390,12 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   
         {/* Popup Title Bar */}
         <rect
-          x="30"
-          y="50"
-          width="240"
-          height="40"
-          rx="20"
-          ry="20"
+          x="15"
+          y="25"
+          width="120"
+          height="20"
+          rx="10"
+          ry="10"
           fill="#4CAF50"
         >
           <animate
@@ -398,10 +406,10 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
           />
         </rect>
         <text
-          x="150"
-          y="75"
+          x="75"
+          y="40"
           textAnchor="middle"
-          fontSize="18"
+          fontSize="10"
           fill="white"
           fontFamily="Arial, sans-serif"
           fontWeight="bold"
@@ -410,53 +418,53 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
         </text>
   
         {/* Close Button */}
-        <g transform="translate(250, 55)">
-          <rect width="20" height="20" rx="5" ry="5" fill="#FF5252" />
+        <g transform="translate(125, 27)">
+          <rect width="10" height="10" rx="3" ry="3" fill="#FF5252" />
           <line
-            x1="5"
-            y1="5"
-            x2="15"
-            y2="15"
+            x1="2.5"
+            y1="2.5"
+            x2="7.5"
+            y2="7.5"
             stroke="white"
-            strokeWidth="2"
+            strokeWidth="1.5"
           />
           <line
-            x1="15"
-            y1="5"
-            x2="5"
-            y2="15"
+            x1="7.5"
+            y1="2.5"
+            x2="2.5"
+            y2="7.5"
             stroke="white"
-            strokeWidth="2"
+            strokeWidth="1.5"
           />
         </g>
   
         {/* Content Area */}
         <rect
-          x="40"
-          y="100"
-          width="220"
-          height="90"
-          rx="15"
-          ry="15"
+          x="20"
+          y="50"
+          width="110"
+          height="45"
+          rx="8"
+          ry="8"
           fill="#F5F5F5"
         />
   
         {/* Content Text */}
         <text
-          x="150"
-          y="130"
+          x="75"
+          y="65"
           textAnchor="middle"
-          fontSize="14"
+          fontSize="8"
           fill="#333"
           fontFamily="Arial, sans-serif"
         >
           This is a beautiful popup!
         </text>
         <text
-          x="150"
-          y="150"
+          x="75"
+          y="75"
           textAnchor="middle"
-          fontSize="12"
+          fontSize="7"
           fill="#666"
           fontFamily="Arial, sans-serif"
         >
@@ -465,15 +473,15 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   
         {/* Subtle Shadow Effect */}
         <rect
-          x="30"
-          y="50"
-          width="240"
-          height="150"
-          rx="20"
-          ry="20"
+          x="15"
+          y="25"
+          width="120"
+          height="75"
+          rx="10"
+          ry="10"
           fill="transparent"
           stroke="rgba(0, 0, 0, 0.1)"
-          strokeWidth="10"
+          strokeWidth="5"
         />
       </svg>
     );
@@ -494,38 +502,71 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   export const ChartSvg: React.FC = () => {
     return (
       <svg width="220" height="120" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="190" height="120" fill="rgba(0, 0, 0, 0.1)" opacity="0.2"/>
-        <rect x="10" y="10" width="200" height="90" rx="8" ry="8" fill="white" stroke="black" strokeWidth="1.5"/>
-        <rect x="20" y="80" width="20" height="20" fill="skyblue">
-          <animate attributeName="height" from="20" to="40" dur="1s" begin="0s" repeatCount="indefinite"/>
-          <animate attributeName="y" from="80" to="60" dur="1s" begin="0s" repeatCount="indefinite"/>
-          <animate attributeName="fill" values="skyblue;lightblue;skyblue" dur="2s" repeatCount="indefinite"/>
+        {/* Background */}
+        <rect x="0" y="0" width="220" height="120" fill="rgba(0, 0, 0, 0.05)" />
+  
+        {/* Chart Container */}
+        <rect
+          x="10"
+          y="10"
+          width="200"
+          height="90"
+          rx="8"
+          ry="8"
+          fill="white"
+          stroke="#E0E0E0"
+          strokeWidth="1"
+        />
+  
+        {/* Bar 1 */}
+        <rect x="20" y="80" width="20" height="20" fill="#64B5F6">
+          <animate attributeName="height" from="20" to="40" dur="1s" begin="0s" repeatCount="indefinite" />
+          <animate attributeName="y" from="80" to="60" dur="1s" begin="0s" repeatCount="indefinite" />
+          <animate attributeName="fill" values="#64B5F6;#90CAF9;#64B5F6" dur="2s" repeatCount="indefinite" />
         </rect>
-        <text x="30" y="105" textAnchor="middle" fontSize="10" fill="black">Bar 1</text>
-        <rect x="60" y="70" width="20" height="35" fill="orange">
-          <animate attributeName="height" from="35" to="50" dur="1s" begin="0.5s" repeatCount="indefinite"/>
-          <animate attributeName="y" from="70" to="50" dur="1s" begin="0.5s" repeatCount="indefinite"/>
-          <animate attributeName="fill" values="orange;gold;orange" dur="2s" repeatCount="indefinite"/>
+        <text x="30" y="105" textAnchor="middle" fontSize="10" fill="#333" fontFamily="Arial, sans-serif">
+          Bar 1
+        </text>
+  
+        {/* Bar 2 */}
+        <rect x="60" y="70" width="20" height="35" fill="#FFA726">
+          <animate attributeName="height" from="35" to="50" dur="1s" begin="0.5s" repeatCount="indefinite" />
+          <animate attributeName="y" from="70" to="50" dur="1s" begin="0.5s" repeatCount="indefinite" />
+          <animate attributeName="fill" values="#FFA726;#FFB74D;#FFA726" dur="2s" repeatCount="indefinite" />
         </rect>
-        <text x="70" y="105" textAnchor="middle" fontSize="10" fill="black">Bar 2</text>
-        <rect x="100" y="50" width="20" height="50" fill="green">
-          <animate attributeName="height" from="50" to="60" dur="1s" begin="1s" repeatCount="indefinite"/>
-          <animate attributeName="y" from="50" to="40" dur="1s" begin="1s" repeatCount="indefinite"/>
-          <animate attributeName="fill" values="green;limegreen;green" dur="2s" repeatCount="indefinite"/>
+        <text x="70" y="105" textAnchor="middle" fontSize="10" fill="#333" fontFamily="Arial, sans-serif">
+          Bar 2
+        </text>
+  
+        {/* Bar 3 */}
+        <rect x="100" y="50" width="20" height="50" fill="#66BB6A">
+          <animate attributeName="height" from="50" to="60" dur="1s" begin="1s" repeatCount="indefinite" />
+          <animate attributeName="y" from="50" to="40" dur="1s" begin="1s" repeatCount="indefinite" />
+          <animate attributeName="fill" values="#66BB6A;#81C784;#66BB6A" dur="2s" repeatCount="indefinite" />
         </rect>
-        <text x="110" y="105" textAnchor="middle" fontSize="10" fill="black">Bar 3</text>
-        <rect x="140" y="80" width="20" height="15" fill="purple">
-          <animate attributeName="height" from="15" to="30" dur="1s" begin="1.5s" repeatCount="indefinite"/>
-          <animate attributeName="y" from="80" to="70" dur="1s" begin="1.5s" repeatCount="indefinite"/>
-          <animate attributeName="fill" values="purple;violet;purple" dur="2s" repeatCount="indefinite"/>
+        <text x="110" y="105" textAnchor="middle" fontSize="10" fill="#333" fontFamily="Arial, sans-serif">
+          Bar 3
+        </text>
+  
+        {/* Bar 4 */}
+        <rect x="140" y="80" width="20" height="15" fill="#BA68C8">
+          <animate attributeName="height" from="15" to="30" dur="1s" begin="1.5s" repeatCount="indefinite" />
+          <animate attributeName="y" from="80" to="70" dur="1s" begin="1.5s" repeatCount="indefinite" />
+          <animate attributeName="fill" values="#BA68C8;#CE93D8;#BA68C8" dur="2s" repeatCount="indefinite" />
         </rect>
-        <text x="150" y="105" textAnchor="middle" fontSize="10" fill="black">Bar 4</text>
-        <rect x="180" y="40" width="20" height="55" fill="red">
-          <animate attributeName="height" from="55" to="70" dur="1s" begin="2s" repeatCount="indefinite"/>
-          <animate attributeName="y" from="40" to="30" dur="1s" begin="2s" repeatCount="indefinite"/>
-          <animate attributeName="fill" values="red;darkred;red" dur="2s" repeatCount="indefinite"/>
+        <text x="150" y="105" textAnchor="middle" fontSize="10" fill="#333" fontFamily="Arial, sans-serif">
+          Bar 4
+        </text>
+  
+        {/* Bar 5 */}
+        <rect x="180" y="40" width="20" height="55" fill="#EF5350">
+          <animate attributeName="height" from="55" to="70" dur="1s" begin="2s" repeatCount="indefinite" />
+          <animate attributeName="y" from="40" to="30" dur="1s" begin="2s" repeatCount="indefinite" />
+          <animate attributeName="fill" values="#EF5350;#E57373;#EF5350" dur="2s" repeatCount="indefinite" />
         </rect>
-        <text x="190" y="105" textAnchor="middle" fontSize="10" fill="black">Bar 5</text>
+        <text x="190" y="105" textAnchor="middle" fontSize="10" fill="#333" fontFamily="Arial, sans-serif">
+          Bar 5
+        </text>
       </svg>
     );
   };
@@ -544,26 +585,155 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   export const DrawerSvg: React.FC = () => {
     return (
       <svg width="300" height="250" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="300" height="250" fill="rgba(0, 0, 0, 0.3)" opacity="0.2"/>
-        <rect x="10" y="50" width="280" height="150" rx="15" ry="15" fill="white" stroke="black" stroke-width="2">
-          <animate attributeName="height" from="150" to="170" dur="2s" repeatCount="indefinite"/>
+        {/* Background overlay */}
+        <rect x="0" y="0" width="300" height="250" fill="rgba(0, 0, 0, 0.2)" />
+  
+        {/* Drawer container with shadow and animation */}
+        <rect
+          x="20"
+          y="60"
+          width="260"
+          height="160"
+          rx="15"
+          ry="15"
+          fill="#ffffff"
+          stroke="#ccc"
+          strokeWidth="1"
+        >
+          {/* Drawer opening/closing animation */}
+          <animate
+            attributeName="height"
+            from="160"
+            to="180"
+            dur="2s"
+            repeatCount="indefinite"
+          />
         </rect>
-        <text x="150" y="90" text-anchor="middle" font-size="16" fill="black">Drawer Content</text>
+  
+        {/* Drawer handle */}
+        <rect x="140" y="70" width="20" height="4" rx="2" ry="2" fill="#ccc" />
+        <rect x="140" y="80" width="20" height="4" rx="2" ry="2" fill="#ccc" />
+  
+        {/* Drawer content text */}
+        <text
+          x="150"
+          y="130"
+          textAnchor="middle"
+          fontSize="16"
+          fill="#333"
+          fontFamily="Arial, sans-serif"
+        >
+          Drawer Content
+        </text>
+  
+        {/* Subtle shadow under the drawer */}
+        <rect
+          x="20"
+          y="220"
+          width="260"
+          height="10"
+          rx="5"
+          ry="5"
+          fill="rgba(0, 0, 0, 0.1)"
+        />
       </svg>
     );
   };
+
+  interface LoadingSpinnerProps {
+    size?: number;
+    color?: string;
+    bgColor?: string;
+    strokeWidth?: number;
+    speed?: number;
+    showBg?: boolean;
+  }
   
-  export const LoadingSvg: React.FC = () => {
+  export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+    size = 100,
+    color = "#4CAF50",
+    bgColor = "rgba(0, 0, 0, 0.1)",
+    strokeWidth = 8,
+    speed = 1.5,
+    showBg = true
+  }) => {
+    const radius = size / 2 - strokeWidth;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference * 0.25;
+  
     return (
-      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="40" stroke="black" stroke-width="5" fill="none" opacity="0.2"/>
-        <circle cx="50" cy="50" r="40" stroke="#4CAF50" stroke-width="5" fill="none" stroke-dasharray="251.2" stroke-dashoffset="125.6">
-          <animate attributeName="stroke-dashoffset" from="125.6" to="251.2" dur="1.5s" repeatCount="indefinite"/>
+      <svg 
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ transform: 'rotate(-90deg)' }}
+        role="status"
+        aria-label="Loading"
+      >
+        {showBg && (
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={bgColor}
+            strokeWidth={strokeWidth}
+            fill="none"
+          />
+        )}
+        
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDashoffset={offset}
+        >
+          <animate
+            attributeName="stroke-dashoffset"
+            from={circumference}
+            to={0}
+            dur={`${speed}s`}
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="stroke"
+            values={`${color};${color};#FF4081;${color}`}
+            dur={`${speed * 2}s`}
+            repeatCount="indefinite"
+          />
+        </circle>
+        
+        {/* Additional rotating element for visual interest */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius - strokeWidth * 1.5}
+          stroke={color}
+          strokeWidth={strokeWidth / 2}
+          fill="none"
+          opacity="0.5"
+        >
+          <animateTransform
+            attributeName="transform"
+            type="rotate"
+            from={`0 ${size / 2} ${size / 2}`}
+            to={`360 ${size / 2} ${size / 2}`}
+            dur={`${speed * 1.5}s`}
+            repeatCount="indefinite"
+          />
         </circle>
       </svg>
     );
   };
   
+  // Usage examples:
+  // <LoadingSpinner />
+  // <LoadingSpinner size={80} color="#FF4081" speed={2} strokeWidth={6} />
   
   export const ToastSvg: React.FC = () => {
     return (
@@ -743,9 +913,34 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
 };
 // Autocomplete Icon
 export const AutocompleteIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
-    <rect x="3" y="4" width="18" height="12" rx="2" ry="2" fill="white" />
-    <circle cx="17" cy="12" r="5" stroke="black" fill="none" />
-    <line x1="19" y1="14" x2="22" y2="17" stroke="black" strokeWidth="2" />
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    {/* Background rectangle with subtle shadow */}
+    <rect x="3" y="4" width="18" height="12" rx="2" ry="2" fill="white" stroke="#ddd" />
+    
+    {/* Magnifying glass circle */}
+    <circle cx="17" cy="12" r="4" stroke="#555" fill="none" />
+    
+    {/* Magnifying glass handle */}
+    <line x1="19" y1="14" x2="21.5" y2="16.5" stroke="#555" strokeWidth="1.5" />
+    
+    {/* Optional: Add a subtle animation to the handle */}
+    <animateTransform
+      attributeName="transform"
+      type="rotate"
+      from="0 17 12"
+      to="5 17 12"
+      dur="1s"
+      repeatCount="indefinite"
+      additive="sum"
+    />
   </svg>
 );
