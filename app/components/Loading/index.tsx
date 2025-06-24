@@ -53,10 +53,9 @@ const Loading: React.FC<LoadingProps> = ({
           children
         ) : (
           <>
-            <div
-              className={`${sizeConfig[size].spinner} border-t-[5px] border-solid rounded-full 
-                animate-[spin_1.5s_linear_infinite,scalePulse_2s_ease-in-out_infinite] ${spinnerColor}`}
-            />
+       
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-75"></div>
+
             {text && (
               <p className={`${sizeConfig[size].text} ${textColor} font-semibold animate-pulse`}>
                 {text}

@@ -1,95 +1,131 @@
-"use client"
-import React, { forwardRef, useEffect } from 'react';
+import React, { FC, ButtonHTMLAttributes, ReactNode } from 'react';
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'glass';
   size?: 'sm' | 'md' | 'lg';
+  iconLeft?: ReactNode;
+  iconRight?: ReactNode;
   isLoading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  ripple?: boolean;
-  rounded?: boolean;
+  loadingText?: string;
+  fullWidth?: boolean;
+  backgroundColor?: string;
+  textColor?: string;
+  hoverEffect?: boolean;
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+  shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  clickAnimation?: boolean;
 }
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      children,
-      variant = 'primary',
-      size = 'md',
-      isLoading = false,
-      disabled = false,
-      leftIcon,
-      rightIcon,
-      ripple = true,
-      rounded = false,
-      className = '',
-      ...props
+const Button: FC<ButtonProps> = ({
+  variant = 'primary',
+  size = 'md',
+  iconLeft,
+  iconRight,
+  isLoading = false,
+  loadingText,
+  fullWidth = false,
+  backgroundColor,
+  textColor,
+  hoverEffect = true,
+  rounded = 'md',
+  shadow = 'none',
+  clickAnimation = false,
+  className = '',
+  children,
+  disabled,
+  ...rest
+}) => {
+  const isIconOnly = !children && (iconLeft || iconRight) && !isLoading;
+
+  const baseStyles = `inline-flex items-center justify-center border font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+    fullWidth ? 'w-full' : ''
+  } ${
+    clickAnimation
+      ? 'transition-all duration-100 active:scale-95'
+      : 'transition-colors'
+  }`;
+
+  const variants = {
+    primary: {
+      base: 'bg-indigo-600 text-white border-transparent hover:bg-indigo-700',
+      focusRing: 'focus:ring-indigo-500',
     },
-    ref
-  ) => {
-    useEffect(() => {
-      if (ripple) {
-        const buttons = document.querySelectorAll('.btn-ripple');
-        const createRipple = (e: MouseEvent) => {
-          const button = e.currentTarget as HTMLButtonElement;
-          const circle = document.createElement('span');
-          const diameter = Math.max(button.clientWidth, button.clientHeight);
-          const radius = diameter / 2;
+    secondary: {
+      base: 'bg-emerald-600 text-white border-transparent hover:bg-emerald-700',
+      focusRing: 'focus:ring-emerald-500',
+    },
+    outline: {
+      base: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50',
+      focusRing: 'focus:ring-gray-500',
+    },
+    ghost: {
+      base: 'bg-transparent text-gray-700 hover:bg-gray-100 border-transparent',
+      focusRing: 'focus:ring-gray-500',
+    },
+    glass: {
+      base: 'bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white',
+      focusRing: 'focus:ring-white/50',
+    },
+  };
 
-          circle.style.width = circle.style.height = `${diameter}px`;
-          circle.style.left = `${e.clientX - (button.offsetLeft + radius)}px`;
-          circle.style.top = `${e.clientY - (button.offsetTop + radius)}px`;
-          circle.classList.add('ripple');
+  const sizeConfig = {
+    sm: { padding: 'px-3 py-1.5', text: 'text-sm', iconPadding: 'p-1.5' },
+    md: { padding: 'px-4 py-2', text: 'text-base', iconPadding: 'p-2' },
+    lg: { padding: 'px-6 py-3', text: 'text-lg', iconPadding: 'p-3' },
+  };
 
-          const rippleEl = button.getElementsByClassName('ripple')[0];
-          if (rippleEl) rippleEl.remove();
+  const roundedStyles = {
+    none: 'rounded-none',
+    sm: 'rounded-sm',
+    md: 'rounded-md',
+    lg: 'rounded-lg',
+    full: 'rounded-full',
+  };
 
-          button.appendChild(circle);
-        };
+  const shadowStyles = {
+    none: 'shadow-none',
+    sm: 'shadow-sm',
+    md: 'shadow-md',
+    lg: 'shadow-lg',
+    xl: 'shadow-xl',
+  };
 
-        buttons.forEach(button => {
-            button.addEventListener('click', createRipple as EventListener);
-          });
-          
+  const sizeClasses = isIconOnly
+    ? `${sizeConfig[size].iconPadding} ${sizeConfig[size].text}`
+    : `${sizeConfig[size].padding} ${sizeConfig[size].text}`;
 
-        return () => {
-          buttons.forEach(button => {
-            button.removeEventListener('click', createRipple as EventListener);
+  const customStyles = {
+    backgroundColor,
+    color: textColor,
+    borderColor: variant === 'outline' ? backgroundColor : undefined,
+  };
 
-          });
-        };
-      }
-    }, [ripple]);
-
-    const baseStyles = `inline-flex items-center justify-center font-medium transition-all 
-      duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 
-      disabled:pointer-events-none ${rounded ? 'rounded-full' : 'rounded-lg'}`;
-
-    const sizeStyles = {
-      sm: 'px-3 py-1.5 text-sm',
-      md: 'px-4 py-2 text-base',
-      lg: 'px-6 py-3 text-lg',
-    };
-
-    const variantStyles = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-      secondary: 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500',
-      outline: 'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
-      ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-500',
-    };
-
-    return (
-      <button
-        ref={ref}
-        disabled={disabled || isLoading}
-        className={`${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]} 
-          ${isLoading ? 'cursor-wait' : ''} ${className} ${ripple ? 'btn-ripple' : ''}`}
-        {...props}
-      >
-        {isLoading && (
+  return (
+    <button
+      className={`
+        ${baseStyles}
+        ${variants[variant].base}
+        ${variants[variant].focusRing}
+        ${sizeClasses}
+        ${roundedStyles[rounded]}
+        ${shadowStyles[shadow]}
+        ${hoverEffect ? 'hover:brightness-95' : ''}
+        ${disabled || isLoading ? 'opacity-75 cursor-not-allowed' : ''}
+        ${className}
+      `}
+      style={customStyles}
+      disabled={disabled || isLoading}
+      aria-disabled={disabled || isLoading}
+      {...rest}
+    >
+      {isLoading ? (
+        <>
           <svg
-            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+            className={`animate-spin -ml-1 mr-3 h-4 w-4 ${
+              ['primary', 'secondary'].includes(variant)
+                ? 'text-white'
+                : 'text-current'
+            }`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -101,23 +137,24 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               r="10"
               stroke="currentColor"
               strokeWidth="4"
-            ></circle>
+            />
             <path
               className="opacity-75"
               fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
+            />
           </svg>
-        )}
+          {loadingText || 'Processing...'}
+        </>
+      ) : (
+        <>
+          {iconLeft && <span className="mr-2">{iconLeft}</span>}
+          {children}
+          {iconRight && <span className="ml-2">{iconRight}</span>}
+        </>
+      )}
+    </button>
+  );
+};
 
-        {!isLoading && leftIcon && <span className="mr-2">{leftIcon}</span>}
-        {children}
-        {!isLoading && rightIcon && <span className="ml-2">{rightIcon}</span>}
-      </button>
-    );
-  }
-);
-
-Button.displayName = 'Button';
-
-export default Button;
+export default React.memo(Button);

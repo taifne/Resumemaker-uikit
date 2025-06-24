@@ -1,7 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FaBars, FaTimes, FaChevronRight, FaCircle } from "react-icons/fa";
+"use client";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { FaBars, FaTimes, FaChevronRight, FaCircle, FaChartArea, FaHeart, FaRegIdCard } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link"; // Use Next.js Link component
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useRole } from "../../hooks/useRoleMutation";
+import { getCookie } from "cookies-next";
+import { useOpenModalStore } from "../../stores/layoutStore";
+import { useAllMenus } from "../../hooks/useMenuMutation";
+import { PiTabsDuotone, PiTreeViewFill } from "react-icons/pi";
+import { AiOutlineDash } from "react-icons/ai";
+import { IoIosArrowDropdownCircle } from "react-icons/io";
+import { LuLoaderCircle } from "react-icons/lu";
+import { MdInsertEmoticon, MdInput, MdAnnouncement } from "react-icons/md";
+import { SlDrawer } from "react-icons/sl";
+import { AutocompleteIcon, PagnitionIcon, PopupIcon, StepperIcon, CustomTableIcon } from "../Icons";
 
 export interface SidebarItem {
   label: string;
@@ -37,7 +50,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   items,
   theme = "dark",
   collapsedWidth = "80px",
-  expandedWidth = "240px",
+  expandedWidth = "260px",
   logo,
   showLogo = true,
   onToggleCollapse,
@@ -45,30 +58,95 @@ const Sidebar: React.FC<SidebarProps> = ({
   subMenuOpenDelay = 300,
   customSubMenuIcon,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+    const [roleId, setRoleId] = useState("");
   const sidebarRef = useRef<HTMLDivElement>(null);
+    const { refetchCookies, setRefetchCookies } = useOpenModalStore();
+      const icons = [
+  <AutocompleteIcon />,
+  <PiTreeViewFill />,
+  <FaHeart />,
+  <FaRegIdCard />,
+  <FaChartArea />,
+  <SlDrawer />,
+  <MdInsertEmoticon />,
+  <MdInput />,
+  <LuLoaderCircle />,
+  <PagnitionIcon />,
+  <PopupIcon />,
+  <StepperIcon />,
+  <CustomTableIcon />,
+  <MdAnnouncement />,
+  <AiOutlineDash />,
+  <IoIosArrowDropdownCircle />,
+  <PiTabsDuotone />,
+];
+function getRandomIcon(icons: JSX.Element[]): JSX.Element {
+  const index = Math.floor(Math.random() * icons.length);
+  return icons[index];
+}
 
-  const themeConfig: SidebarTheme = typeof theme === "string" ? 
-    {
-      light: {
-        background: "bg-white",
-        text: "text-gray-800",
-        activeBackground: "bg-blue-500",
-        activeText: "text-white",
-        hoverBackground: "bg-gray-100",
-        border: "border-gray-200",
-      },
-      dark: {
-        background: "bg-gradient-to-b from-gray-800 to-gray-700", // Gradient background for dark theme
-        text: "text-white",
-        activeBackground: "bg-blue-600",
-        activeText: "text-white",
-        hoverBackground: "bg-gray-700",
-        border: "border-gray-700",
-      },
-    }[theme] : theme;
+  const pathname = usePathname();
+      const { data: role, isLoading, isError } = useRole(roleId);
+        const { data: menus, isLoading: loadingMenus } = useAllMenus();
+  useEffect(() => {
+    const userRoleCookie = getCookie("userRole")?.toString()??"";
+
+    setRoleId(userRoleCookie);
+  }, [refetchCookies]);
+
+    const filteredMenus = useMemo(() => {
+    if (!role?.menus) return [];
+
+    const roleMenuIds = role.menus.map((m) =>
+      typeof m === 'string' ? m : m._id // handles both populated and non-populated
+    );
+
+    return menus?.filter((menu) => roleMenuIds.includes(menu._id)) .map((menu) => ({
+        label: menu.label,
+        icon:  getRandomIcon(icons),
+        link: `http://localhost:8080/${menu.path}`,
+        subItems:[]
+        // Optional: include subItems if you have hierarchical menus
+      }));;
+  }, [menus, role?.menus]);
+  const themeConfig: SidebarTheme =
+    typeof theme === "string"
+      ? {
+          light: {
+            background: "bg-white dark:bg-gray-800",
+            text: "text-gray-800 dark:text-gray-200",
+            activeBackground: "bg-blue-100 dark:bg-blue-800",
+            activeText: "text-blue-600 dark:text-blue-200",
+            hoverBackground: "hover:bg-gray-100 dark:hover:bg-gray-700",
+            border: "border-gray-200 dark:border-gray-700",
+          },
+          dark: {
+            background: "bg-gray-900 dark:bg-gray-800",
+            text: "text-gray-200 dark:text-gray-200",
+            activeBackground: "bg-blue-800 dark:bg-blue-800",
+            activeText: "text-blue-200 dark:text-blue-200",
+            hoverBackground: "hover:bg-gray-800 dark:hover:bg-gray-700",
+            border: "border-gray-700 dark:border-gray-700",
+          },
+        }[theme]
+      : theme;
+
+  // Add dark mode detection
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  useEffect(() => {
+    const darkModeMediaQuery = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+    setIsDarkMode(darkModeMediaQuery.matches);
+
+    const handler = (e: MediaQueryListEvent) => setIsDarkMode(e.matches);
+    darkModeMediaQuery.addEventListener("change", handler);
+    return () => darkModeMediaQuery.removeEventListener("change", handler);
+  }, []);
+
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -104,7 +182,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.touches[0].clientX;
     };
-    
+
     const handleTouchEnd = (e: TouchEvent) => {
       const touchEndX = e.changedTouches[0].clientX;
       const deltaX = touchEndX - touchStartX;
@@ -123,12 +201,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     };
   }, [enableTouchGestures]);
 
+  const isActiveLink = (link: string) => pathname === link;
+
   return (
     <motion.div
       ref={sidebarRef}
-      className={`flex flex-col h-full shadow-xl ${themeConfig.background} ${themeConfig.text} ${
-        themeConfig.border ? `border-r ${themeConfig.border}` : ""
-      } rounded-lg`}
+      className={`flex flex-col h-full shadow-xl transition-colors duration-300 
+        ${themeConfig.background} ${themeConfig.text} 
+        ${themeConfig.border ? `border-r ${themeConfig.border}` : ""}`}
       style={{
         width: isCollapsed ? collapsedWidth : expandedWidth,
         minWidth: isCollapsed ? collapsedWidth : expandedWidth,
@@ -139,25 +219,33 @@ const Sidebar: React.FC<SidebarProps> = ({
       }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      {/* Sidebar Header */}
+      {/* Enhanced Header */}
       {showLogo && (
         <motion.div
-          className={`flex items-center p-4 ${isCollapsed ? "justify-center" : "justify-between"}`}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          className={`flex items-center p-4 border-none ${
+            isCollapsed ? "justify-center" : "justify-between"
+          }`}
         >
           {!isCollapsed && (
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xl font-bold tracking-wide"
+              className="text-xl font-semibold"
             >
-              {logo || "MyApp"}
+              {logo || (
+                <span className={`${themeConfig.activeText} tracking-wide`}>
+                  MB-FIBAT
+                </span>
+              )}
             </motion.div>
           )}
           <button
             onClick={toggleCollapse}
-            className="p-2 rounded-lg hover:bg-opacity-20 hover:bg-current transition-all"
+            className={`p-2 rounded-lg transition-all ${
+              isDarkMode
+                ? "hover:bg-gray-700 text-gray-300"
+                : "hover:bg-gray-100 text-gray-600"
+            }`}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? <FaBars /> : <FaTimes />}
@@ -165,52 +253,54 @@ const Sidebar: React.FC<SidebarProps> = ({
         </motion.div>
       )}
 
-      {/* Sidebar Menu Items */}
-      <nav className="flex-1 overflow-y-auto p-2">
-        <ul className="space-y-2">
-          {items.map((item) => (
+      {/* Enhanced Menu Items */}
+      <nav className="flex-1 overflow-y-auto no-scrollbar px-1 pb-4">
+        <ul className="space-y-1">
+          {filteredMenus?.map((item) => (
             <li key={item.link} className="relative">
               <Link href={item.link} passHref>
                 <motion.div
-                  className={`flex items-center rounded-lg p-3 transition-all duration-200 ease-in-out transform hover:scale-105 ${
-                    1
-                      ? `${themeConfig.activeBackground} ${themeConfig.activeText} shadow-md`
-                      : `hover:${themeConfig.hoverBackground}`
+                  whileHover={{ scale: 1.02 }}
+                  className={`flex items-center rounded-lg p-3 cursor-pointer transition-all ${
+                    isActiveLink(item.link)
+                      ? `${themeConfig.activeBackground} ${themeConfig.activeText}`
+                      : themeConfig.hoverBackground
                   }`}
+                  onClick={() => item.subItems && handleSubMenu(item.link)}
                 >
-                  <div className="flex items-center w-full">
-                    <span className="text-xl mr-3">{item.icon}</span>
+                  <div className="flex items-center w-full space-x-3">
+                    <span
+                      className={`text-lg ${
+                        isActiveLink(item.link) ? "opacity-100" : "opacity-75"
+                      }`}
+                    >
+                      {item.icon}
+                    </span>
                     {!isCollapsed && (
                       <motion.span
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex-1 truncate font-medium"
+                        className="flex-1 truncate text-sm font-medium"
                       >
                         {item.label}
                       </motion.span>
                     )}
-                    {item.badge && !isCollapsed && (
-                      <motion.span
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="ml-2 px-2 py-1 text-xs font-bold bg-red-500 text-white rounded-full"
-                      >
-                        {item.badge}
-                      </motion.span>
-                    )}
+                  
                     {item.subItems && !isCollapsed && (
                       <motion.div
-                        className="ml-2"
+                        className="ml-auto"
                         animate={{ rotate: openSubMenu === item.link ? 90 : 0 }}
                       >
-                        {customSubMenuIcon || <FaChevronRight />}
+                        {customSubMenuIcon || (
+                          <FaChevronRight className="text-sm opacity-75" />
+                        )}
                       </motion.div>
                     )}
                   </div>
                 </motion.div>
               </Link>
 
-              {/* Subitems */}
+              {/* Enhanced Subitems */}
               {item.subItems && (
                 <AnimatePresence>
                   {openSubMenu === item.link && !isCollapsed && (
@@ -218,25 +308,27 @@ const Sidebar: React.FC<SidebarProps> = ({
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="pl-8 pt-1"
+                      className="pl-11 pt-1"
                     >
                       <ul className="space-y-1">
-                        {item.subItems.map((subItem) => (
+                        {/* {item.subItems.map((subItem) => (
                           <li key={subItem.link}>
                             <Link href={subItem.link} passHref>
                               <motion.div
                                 className={`flex items-center rounded-lg p-2 text-sm ${
-                                  1
-                                    ? "bg-opacity-20 bg-current"
-                                    : `hover:${themeConfig.hoverBackground}`
+                                  isActiveLink(subItem.link)
+                                    ? `${themeConfig.activeBackground} ${themeConfig.activeText}`
+                                    : themeConfig.hoverBackground
                                 }`}
                               >
-                                <FaCircle className="w-2 h-2 mr-2" />
-                                <span className="truncate">{subItem.label}</span>
+                                <FaCircle className="w-2 h-2 mr-2 opacity-50" />
+                                <span className="truncate">
+                                  {subItem.label}
+                                </span>
                               </motion.div>
                             </Link>
                           </li>
-                        ))}
+                        ))} */}
                       </ul>
                     </motion.div>
                   )}
@@ -247,20 +339,20 @@ const Sidebar: React.FC<SidebarProps> = ({
         </ul>
       </nav>
 
-      {/* Collapsed Tooltips */}
+      {/* Enhanced Tooltips */}
       {isCollapsed && (
         <div className="absolute left-full ml-2">
           {items.map((item) => (
             <motion.div
               key={item.link}
-              className="px-3 py-2 bg-gray-900 text-white text-sm rounded-lg shadow-xl"
+              className="px-3 py-2 bg-gray-900 dark:bg-gray-800 text-white text-sm rounded-lg shadow-lg"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
             >
               {item.label}
               {item.badge && (
-                <span className="ml-2 px-2 py-1 bg-red-500 rounded-full">
+                <span className="ml-2 px-2 py-1 bg-blue-500 rounded-full text-xs">
                   {item.badge}
                 </span>
               )}

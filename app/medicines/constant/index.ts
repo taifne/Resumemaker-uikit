@@ -1,0 +1,78 @@
+import { Column } from "../../components/table"
+import { Medicine } from "../../hooks/useLazyMedicines"
+
+export const medicineColumns: Column<Medicine>[] = [
+    {
+      key: "name",
+      label: "Name",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "text",
+      reorderable: true,
+      frozen: true,
+    },
+    {
+      key: "manufacturer",
+      label: "Manufacturer",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "text",
+      reorderable: true,
+    },
+    {
+      key: "expiryDate",
+      label: "Expiry Date",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "date",
+      reorderable: true,
+    },
+    {
+      key: "dosage",
+      label: "Dosage",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "text",
+      reorderable: true,
+    },
+    {
+      key: "price",
+      label: "Price",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "number",
+      reorderable: true,
+    },
+    {
+      key: "quantityInStock",
+      label: "Quantity In Stock",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "number",
+      reorderable: true,
+    },
+    {
+      key: "supplier",
+      label: "Supplier",
+      sortable: true,
+      editable: true,
+      resizable: true,
+      filterable: true,
+      type: "text",
+      reorderable: true,
+    },
+   
+  ];
+

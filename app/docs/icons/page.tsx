@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import { HomeIcon, UserIcon, BellIcon, GitHubIcon, FacebookIcon, TwitterIcon, LinkedInIcon, InstagramIcon } from '../../components/Icons';
 

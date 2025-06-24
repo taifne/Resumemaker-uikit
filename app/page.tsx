@@ -23,7 +23,6 @@ import Card from "./components/Card/card";
 
 export default function Home() {
   
-
   return ( 
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
   {[
@@ -43,7 +42,7 @@ export default function Home() {
     { title: "Table", description: "Table Component", icon: <TableSVG /> },
   ].map((item, index) => (
     <Card key={index} title={item.title} description={item.description} linkUrl="#">
-      <div className="flex justify-center items-center h-20">{item.icon}</div>
+      <div className="flex justify-center items-center h-24">{item.icon}</div>
     </Card>
   ))}
 </div>

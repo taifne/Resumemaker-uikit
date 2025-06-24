@@ -1,7 +1,18 @@
 import React, { ForwardedRef, forwardRef, useState } from 'react';
 
 type InputProps = {
-  type?: 'text' | 'email' | 'password' | 'number' | 'search';
+  type?: 
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'search'
+    | 'date'
+    | 'datetime-local'
+    | 'time'
+    | 'url'
+    | 'tel'
+    | 'yearborn';
   label?: string;
   error?: string;
   success?: boolean;
@@ -16,6 +27,7 @@ type InputProps = {
   onChange?: (value: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void; // ✅ added
   autoComplete?: string;
 };
 
@@ -37,12 +49,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       onChange,
       onFocus,
       onBlur,
+      onKeyDown, // ✅ added
       autoComplete,
     }: InputProps,
     ref: ForwardedRef<HTMLInputElement>
   ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const currentYear = new Date().getFullYear();
 
     const sizeClasses = {
       sm: 'px-3 py-1.5 text-sm',
@@ -52,14 +66,25 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const getInputType = () => {
       if (type === 'password' && showPassword) return 'text';
+      if (type === 'yearborn') return 'number';
       return type;
+    };
+
+    const getExtraProps = () => {
+      if (type === 'yearborn') {
+        return {
+          min: 1900,
+          max: currentYear,
+        };
+      }
+      return {};
     };
 
     return (
       <div className={`${fullWidth ? 'w-full' : 'w-fit'}`}>
         {label && (
           <label
-            className={`block mb-2 text-sm font-medium ${
+            className={`block mb-2 text-sm font-bold ${
               disabled ? 'text-gray-400' : 'text-gray-700'
             }`}
           >
@@ -111,10 +136,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               setIsFocused(false);
               onBlur?.();
             }}
+            onKeyDown={onKeyDown} // ✅ pass it down
             placeholder={placeholder}
             disabled={disabled}
             autoComplete={autoComplete}
+            {...getExtraProps()}
             className={`
+              py-0
               w-full bg-transparent outline-none
               ${disabled ? 'cursor-not-allowed' : ''}
               ${startIcon ? 'ml-1' : ''}
@@ -142,6 +170,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <span className="ml-2 text-green-500">✔</span>
           )}
         </div>
+
+        {type === 'yearborn' && !disabled && (
+          <p className="mt-1 text-xs text-gray-500 italic">Beauty is required</p>
+        )}
 
         {error && !disabled && (
           <p className="mt-2 text-sm text-red-600">{error}</p>

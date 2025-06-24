@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { FaChevronRight, FaChevronDown, FaFolder, FaFolderOpen, FaFile, FaRegCheckSquare, FaRegSquare } from 'react-icons/fa';
 
 type TreeNode = {
@@ -33,7 +33,14 @@ const Treeview: React.FC<TreeviewProps> = ({
   const [openNodes, setOpenNodes] = useState<string[]>(expandAll ? getAllIds(data) : []);
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
-  // Get all node IDs for expandAll functionality
+  useEffect(() => {
+    if (expandAll) {
+      setOpenNodes(getAllIds(data));
+    } else {
+      setOpenNodes([]);
+    }
+  }, [expandAll, data]);
+
   function getAllIds(nodes: TreeNode[]): string[] {
     return nodes.reduce<string[]>((acc, node) => {
       acc.push(node.id);
@@ -68,40 +75,44 @@ const Treeview: React.FC<TreeviewProps> = ({
     const isOpen = openNodes.includes(node.id);
     const isSelected = selectedNodes.has(node.id);
     const hasChildren = node.children && node.children.length > 0;
+    const marginLeft = level * 20; // 20px per level
 
     return (
       <div 
         key={node.id}
-        className={`relative ${showConnectors ? 'ml-6' : 'ml-4'} ${level === 0 ? 'my-1' : ''}`}
+        className={`relative ${level === 0 ? 'my-1' : ''}`}
+        style={{ marginLeft: `${marginLeft}px` }}
         role="treeitem"
         aria-expanded={hasChildren ? isOpen : undefined}
         aria-selected={isSelected}
+        id={`node-${node.id}`}
+        tabIndex={node.isDisabled ? -1 : 0}
+        onClick={() => {
+          if (node.isDisabled) return;
+          if (hasChildren) toggleNode(node.id);
+          handleSelect(node.id);
+        }}
+        onKeyDown={(e) => {
+          if (node.isDisabled) return;
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (hasChildren) toggleNode(node.id);
+            handleSelect(node.id);
+          }
+        }}
       >
-        {/* Connector lines */}
         {showConnectors && level > 0 && (
-          <div className="absolute top-5 left-3 w-px h-[calc(100%-24px)] bg-gray-300" />
+          <div 
+            className="absolute top-5 left-3 w-px h-[calc(100%-24px)] bg-gray-300" 
+            style={{ left: '12px' }} // Adjust based on your icon size
+          />
         )}
 
         <div
           className={`flex items-center gap-2 p-2 rounded-lg transition-colors
             ${node.isDisabled ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer'}
             ${isSelected ? 'bg-blue-50 border border-blue-200' : ''}`}
-          onClick={() => {
-            if (node.isDisabled) return;
-            if (hasChildren) toggleNode(node.id);
-            handleSelect(node.id);
-          }}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              if (hasChildren) toggleNode(node.id);
-              handleSelect(node.id);
-            }
-          }}
         >
-          {/* Toggle icon */}
           {hasChildren ? (
             <span className="text-gray-500">
               {isOpen ? (
@@ -111,10 +122,9 @@ const Treeview: React.FC<TreeviewProps> = ({
               )}
             </span>
           ) : (
-            <span className="w-4 h-4" /> // Spacer for alignment
+            <span className="w-4 h-4" />
           )}
 
-          {/* Selection checkbox */}
           {selectable && (
             <span className="text-gray-600">
               {isSelected ? (
@@ -125,7 +135,6 @@ const Treeview: React.FC<TreeviewProps> = ({
             </span>
           )}
 
-          {/* Custom icon or default */}
           <span className="text-gray-600">
             {node.icon || (hasChildren ? (
               isOpen ? <FaFolderOpen className="w-5 h-5" /> : <FaFolder className="w-5 h-5" />
@@ -134,13 +143,11 @@ const Treeview: React.FC<TreeviewProps> = ({
             ))}
           </span>
 
-          {/* Node label */}
           <span className={`text-gray-800 ${node.isDisabled ? 'opacity-50' : ''}`}>
             {node.label}
           </span>
         </div>
 
-        {/* Children nodes */}
         {hasChildren && isOpen && (
           <div 
             className="relative"

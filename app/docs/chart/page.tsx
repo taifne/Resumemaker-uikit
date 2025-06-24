@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import Chart from '../../components/Chart';
+import CustomChart from '../../components/Chart';
 
 const BarChartDocs: React.FC = () => {
   const [data, setData] = useState([
@@ -10,9 +11,14 @@ const BarChartDocs: React.FC = () => {
     { label: "April", value: 60 },
     { label: "May", value: 70 },
   ]);
-
+  const sampleData = [
+    { x: 'Jan', y: 4000, profit: 2400 },
+    { x: 'Feb', y: 3000, profit: 1398 },
+    { x: 'Mar', y: 2000, profit: 9800 },
+    { x: 'Apr', y: 2780, profit: 3908 },
+  ];
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-white shadow-md rounded-lg">
+    <div className="w-full mx-auto p-8 bg-white shadow-md rounded-lg">
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">BarChart Component</h1>
       <p className="text-gray-700 mb-6 text-lg text-center">
         The <strong>BarChart</strong> component provides a customizable bar chart with the ability to display data values, adjust bar orientation, and filter data with a range slider.
@@ -21,15 +27,59 @@ const BarChartDocs: React.FC = () => {
       <div className="mb-8  p-6 bg-gray-100 rounded-lg">
         <h2 className="text-xl font-semibold mb-2 text-gray-800">Example Usage</h2>
         <p className="text-gray-600 mb-4">Here’s how to use the BarChart component:</p>
-        <Chart 
-          data={data} 
-          title="Monthly Sales" 
-          orientation="vertical" 
-          barColor="#3B82F6" 
-          showValues={true} 
-          rangeSlider={true} 
-          padding={8}
-        />
+        <CustomChart
+      data={sampleData}
+      title="Monthly Revenue & Profit"
+      chartType="area"
+      width="50%"
+      height={400}
+      colors={['#8884d8', '#82ca9d']}
+      xAxisLabel="Months"
+      yAxisLabel="Amount ($)"
+      showLegend={true}
+      showTooltip={true}
+      showGrid={true}
+      stacked={true}
+      animationDuration={600}
+      brush={true}
+      referenceLineY={5000}
+      isLoading={false}
+    />   <CustomChart
+    data={sampleData}
+    title="Monthly Revenue & Profit"
+    chartType="line"
+    width="50%"
+    height={400}
+    colors={['#8884d8', '#82ca9d']}
+    xAxisLabel="Months"
+    yAxisLabel="Amount ($)"
+    showLegend={true}
+    showTooltip={true}
+    showGrid={true}
+    stacked={true}
+    animationDuration={600}
+    brush={true}
+    referenceLineY={5000}
+    isLoading={false}
+  />
+   <CustomChart
+    data={sampleData}
+    title="Monthly Revenue & Profit"
+    chartType="bar"
+    width="50%"
+    height={400}
+    colors={['#8884d8', '#82ca9d']}
+    xAxisLabel="Months"
+    yAxisLabel="Amount ($)"
+    showLegend={true}
+    showTooltip={true}
+    showGrid={true}
+    stacked={true}
+    animationDuration={600}
+    brush={true}
+    referenceLineY={5000}
+    isLoading={false}
+  />
       </div>
 
       <h2 className="text-2xl font-semibold mt-6 mb-4 text-gray-800">Code Example</h2>

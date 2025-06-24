@@ -138,7 +138,11 @@ const Card = ({
           <p className="text-current/80">{description}</p>
         </header>
 
-        {children && <section className="mt-2 mb-4">{children}</section>}
+        {children && (
+          <section className="mt-2 mb-4 overflow-y-auto max-h-[200px]">
+            {children}
+          </section>
+        )}
 
         {linkUrl && (
           <footer className="mt-auto pt-4">

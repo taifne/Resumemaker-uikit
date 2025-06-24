@@ -6,9 +6,10 @@ type ToastProps = {
   message: string;
   type?: 'success' | 'error' | 'info' | 'warning';
   duration?: number;
-  icon?: React.ReactNode; // Custom icon override
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'; // Positioning options
+  icon?: React.ReactNode;
+  position?: 'top-right' | 'top-left' | 'top-center' | 'bottom-right' | 'bottom-left';
 };
+
 
 const Toast: React.FC<ToastProps> = ({
   message,
@@ -41,12 +42,14 @@ const Toast: React.FC<ToastProps> = ({
     };
   }, [duration]);
 
-  const positions = {
-    'top-right': 'top-5 right-5',
-    'top-left': 'top-5 left-5',
-    'bottom-right': 'bottom-5 right-5',
-    'bottom-left': 'bottom-5 left-5',
-  };
+const positions = {
+  'top-right': 'top-5 right-5',
+  'top-left': 'top-5 left-5',
+  'top-center': 'top-5 left-1/2 -translate-x-1/2',
+  'bottom-right': 'bottom-5 right-5',
+  'bottom-left': 'bottom-5 left-5',
+};
+
 
   const toastClasses = {
     success: 'bg-emerald-500 border-emerald-600',
@@ -70,7 +73,7 @@ const Toast: React.FC<ToastProps> = ({
     <div
       role="alert"
       aria-live="assertive"
-      className={`fixed ${positions[position]} min-w-[300px] max-w-md rounded-lg border shadow-xl backdrop-blur-sm transition-all duration-300 ${
+      className={`z-[1001] fixed ${positions[position]} min-w-[300px] max-w-md rounded-lg border shadow-xl backdrop-blur-sm transition-all duration-300 ${
         isExiting ? 'opacity-0 translate-y-6' : 'opacity-100 translate-y-0'
       } ${toastClasses[type]}`}
     >

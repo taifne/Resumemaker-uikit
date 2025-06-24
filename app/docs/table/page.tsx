@@ -13,10 +13,11 @@ const App = () => {
       job: "Developer",
       salary: 50000,
       country: "USA",
-      department: "EngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineering",
+      department:
+        "EngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineeringEngineering",
       status: "Active",
       dateJoined: "2020-01-01",
-      actions:""
+      actions: "",
     },
     {
       id: 2,
@@ -29,7 +30,7 @@ const App = () => {
       department: "Design",
       status: "Inactive",
       dateJoined: "2019-03-12",
-        actions:""
+      actions: "",
     },
     {
       id: 3,
@@ -42,7 +43,7 @@ const App = () => {
       department: "Sales",
       status: "Active",
       dateJoined: "2018-07-25",
-        actions:""
+      actions: "",
     },
     {
       id: 4,
@@ -55,7 +56,7 @@ const App = () => {
       department: "Engineering",
       status: "Active",
       dateJoined: "2021-05-19",
-        actions:""
+      actions: "",
     },
     {
       id: 5,
@@ -68,7 +69,7 @@ const App = () => {
       department: "Design",
       status: "Inactive",
       dateJoined: "2019-11-03",
-        actions:""
+      actions: "",
     },
     {
       id: 6,
@@ -81,7 +82,7 @@ const App = () => {
       department: "Sales",
       status: "Active",
       dateJoined: "2017-02-18",
-        actions:""
+      actions: "",
     },
     {
       id: 7,
@@ -94,7 +95,7 @@ const App = () => {
       department: "Engineering",
       status: "Inactive",
       dateJoined: "2020-10-30",
-        actions:""
+      actions: "",
     },
     {
       id: 8,
@@ -107,7 +108,7 @@ const App = () => {
       department: "Design",
       status: "Active",
       dateJoined: "2018-06-24",
-        actions:""
+      actions: "",
     },
     {
       id: 9,
@@ -120,7 +121,7 @@ const App = () => {
       department: "Sales",
       status: "Active",
       dateJoined: "2016-09-09",
-        actions:""
+      actions: "",
     },
     {
       id: 10,
@@ -133,7 +134,7 @@ const App = () => {
       department: "Engineering",
       status: "Inactive",
       dateJoined: "2021-01-13",
-        actions:""
+      actions: "",
     },
     {
       id: 11,
@@ -146,7 +147,7 @@ const App = () => {
       department: "Design",
       status: "Active",
       dateJoined: "2015-04-08",
-        actions:""
+      actions: "",
     },
     {
       id: 12,
@@ -159,7 +160,7 @@ const App = () => {
       department: "Sales",
       status: "Active",
       dateJoined: "2020-08-21",
-        actions:""
+      actions: "",
     },
     {
       id: 13,
@@ -172,7 +173,7 @@ const App = () => {
       department: "Engineering",
       status: "Inactive",
       dateJoined: "2018-11-15",
-        actions:""
+      actions: "",
     },
     {
       id: 14,
@@ -185,7 +186,7 @@ const App = () => {
       department: "Design",
       status: "Active",
       dateJoined: "2019-09-04",
-        actions:""
+      actions: "",
     },
     {
       id: 15,
@@ -198,7 +199,7 @@ const App = () => {
       department: "Sales",
       status: "Inactive",
       dateJoined: "2017-12-27",
-        actions:""
+      actions: "",
     },
     {
       id: 16,
@@ -211,7 +212,7 @@ const App = () => {
       department: "Engineering",
       status: "Active",
       dateJoined: "2018-04-19",
-        actions:""
+      actions: "",
     },
     {
       id: 17,
@@ -224,7 +225,7 @@ const App = () => {
       department: "Design",
       status: "Active",
       dateJoined: "2020-02-25",
-        actions:""
+      actions: "",
     },
     {
       id: 18,
@@ -237,7 +238,7 @@ const App = () => {
       department: "Sales",
       status: "Active",
       dateJoined: "2016-07-09",
-        actions:""
+      actions: "",
     },
     {
       id: 19,
@@ -250,7 +251,7 @@ const App = () => {
       department: "Engineering",
       status: "Inactive",
       dateJoined: "2021-03-14",
-        actions:""
+      actions: "",
     },
     {
       id: 20,
@@ -263,7 +264,7 @@ const App = () => {
       department: "Design",
       status: "Active",
       dateJoined: "2019-02-10",
-        actions:""
+      actions: "",
     },
   ];
 
@@ -278,7 +279,7 @@ const App = () => {
     department: string;
     status: string;
     dateJoined: string;
-    actions:string;
+    actions: string;
   }>[] = [
     { key: "id", label: "ID", sortable: true, resizable: true },
     {
@@ -287,11 +288,11 @@ const App = () => {
       sortable: true,
       editable: true,
       resizable: true,
-      filterable:true,
-      type:"text",
-      reorderable:true,
-      frozen:true
-    },  
+      filterable: true,
+      type: "text",
+      reorderable: true,
+      frozen: true,
+    },
     // sortable?: boolean;
     // editable?: boolean;
     // resizable?: boolean;
@@ -305,17 +306,19 @@ const App = () => {
       sortable: true,
       editable: true,
       resizable: true,
+      reorderable: true,
     },
-    { key: "city", label: "City", filterable: true, resizable: true },
+    { key: "city", label: "City", filterable: true, resizable: true,reorderable: true, },
     {
       key: "job",
       label: "Job",
       filterable: true,
       editable: true,
       resizable: true,
-      reorderable:true,
-      type:"text",
+      reorderable: true,
+      type: "text",
       sortable: true,
+      frozen: true,
     },
     {
       key: "salary",
@@ -333,19 +336,19 @@ const App = () => {
       sortable: true,
       type: "date",
       editable: true,
-    }, {
-        key: "actions",
-        label: "Actions",
-        render: (value, row) => (
-          <button
-            onClick={() => console.log(row)}
-            className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 transition"
-          >
-            View
-          </button>
-        ),
-      },
-      
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (value, row) => (
+        <button
+          onClick={() => console.log(row)}
+          className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 transition"
+        >
+          View
+        </button>
+      ),
+    },
   ];
 
   const [initialColumnWidths, setInitialColumnWidths] = useState({
@@ -377,18 +380,20 @@ const App = () => {
   };
 
   return (
-    <div className="App max-h-[700px]">
+    <div className="App max-h-[900px]">
       <Table
         columns={columns}
         data={data}
         selectedRows={selectedRows}
         setSelectedRows={handleSelectedRowsChange}
         columnWidths={initialColumnWidths}
-        onEdit={handleEdit} 
+        onEdit={handleEdit}
       />
-   
-       <h2 className="mt-4 text-lg font-semibold">Edited Rows:</h2>
-       <pre className="bg-gray-100 p-2">{JSON.stringify(editedRows, null, 2)}</pre>
+
+      <h2 className="mt-4 text-lg font-semibold">Edited Rows:</h2>
+      <pre className="bg-gray-100 p-2">
+        {JSON.stringify(editedRows, null, 2)}
+      </pre>
     </div>
   );
 };

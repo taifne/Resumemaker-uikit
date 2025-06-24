@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { Popup } from '../../components/Popup';
+import Fireworks from '../../components/Firework';
 
 const PopupDocumentation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -142,21 +143,23 @@ export default App;`}
         Open Main Popup
       </button>
 
-      <Popup
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        showNestedButton={true}
-        nestedPopupContent={     <Popup
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            showNestedButton={true}
-            nestedPopupContent={<div>Content of the nested popup!</div>}
-          >
-            <p>This is the content of the main popup.</p>
-          </Popup>}
-      >
-        <p>This is the content of the main popup.</p>
-      </Popup>
+     <Popup
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Main Popup"
+  width="w-[800px]"
+  maxNestedDepth={3}
+  nestedPopupContent={
+    <div>
+      <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 opacity-50" />
+      <Fireworks />
+    </div>
+  }
+>
+  <div>
+    <p>Main popup content</p>
+  </div>
+</Popup>
     </div>
         <h2 className="text-xl font-semibold mb-2">Nested Popup</h2>
         <p>

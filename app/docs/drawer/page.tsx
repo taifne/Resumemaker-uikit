@@ -38,7 +38,7 @@ const [isOpen, setIsOpen] = useState(false);
         Open Drawer
       </button>
 
-      <Drawer isOpen={isOpen} onClose={toggleDrawer} items={drawerItems} />
+      <Drawer isOpen={isOpen} onClose={toggleDrawer} items={drawerItems} isDark={true} >hehe</Drawer>
     </div>
   );
 };

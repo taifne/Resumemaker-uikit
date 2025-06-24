@@ -1,6 +1,30 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { FiChevronUp, FiChevronDown, FiX, FiSettings, FiEdit, FiTrash, FiCopy, FiDownload, FiSliders } from "react-icons/fi";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  FiChevronUp,
+  FiChevronDown,
+  FiX,
+  FiSettings,
+  FiEdit,
+  FiTrash,
+  FiCopy,
+  FiDownload,
+  FiSliders,
+  FiSearch,
+  FiMoreVertical,
+} from "react-icons/fi";
 import { Menu, Transition } from "@headlessui/react";
+import { clsx } from "clsx";
+import { EmptyState } from "./EmptyState";
+import TableFooter from "./Footer";
+import GroupHeader from "./Groupheader";
+import { PiCaretUpDownFill } from "react-icons/pi";
+import GroupedRows from "./GroupedRows";
 
 export interface Column<T> {
   key: keyof T & string;
@@ -24,10 +48,13 @@ interface TableProps<T> {
   groupBy?: keyof T;
   rowsPerPageOptions?: number[];
   columnWidths?: Record<string, number>;
-  selectedRows?: Set<number>;
-  setSelectedRows?: (selected: Set<number>) => void;
+  selectedRows?: Set<T>;
+ setSelectedRows?: React.Dispatch<React.SetStateAction<Set<T>>>;
   onEdit?: (rowIndex: number, before: T, after: T) => void;
   loading?: boolean;
+  isDark?: boolean;
+  focusedRowData?:any;
+  setFocusedRowData?:(row: T) => void;
 }
 
 const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
@@ -44,17 +71,31 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     setSelectedRows,
     onEdit,
     loading = false,
+    isDark = false,
+    setFocusedRowData,
+  focusedRowData
+
+
   } = props;
   const [sortColumn, setSortColumn] = useState<keyof T | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    new Set()
+  );
   const [hiddenColumns, setHiddenColumns] = useState<Set<string>>(new Set());
   const [editedCells, setEditedCells] = useState<Record<string, string>>({});
-  const [columnsOrder, setColumnsOrder] = useState<string[]>(columns.map(c => c.key));
+  const [columnsOrder, setColumnsOrder] = useState<string[]>(
+    columns.map((c) => c.key)
+  );
+  const [focusedRowIndex, setFocusedRowIndex] = useState<number | null>(null);
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
-  const [contextMenu, setContextMenu] = useState<{colKey: string; x: number; y: number} | null>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    colKey: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
   const columnResizersRef = useRef<Record<string, HTMLDivElement | null>>({});
   const cellRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -63,21 +104,29 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
   const [rowsPerPage, setRowsPerPage] = useState(rowsPerPageOptions[0]);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
-  const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() => {
-    if (Object.keys(propColumnWidths).length > 0) return propColumnWidths;
-    const savedWidths = localStorage.getItem("columnWidths");
-    return savedWidths ? JSON.parse(savedWidths) : {};
-  });
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>(
+    () => {
+      if (Object.keys(propColumnWidths).length > 0) return propColumnWidths;
+      const savedWidths = localStorage.getItem("columnWidths");
+      return savedWidths ? JSON.parse(savedWidths) : {};
+    }
+  );
 
+  useEffect(()=>{
+    console.log(editedCells)
+  },[editedCells])
   useEffect(() => {
     localStorage.setItem("columnWidths", JSON.stringify(columnWidths));
   }, [columnWidths]);
 
   useEffect(() => {
-    setColumnsOrder(columns.map(c => c.key));
+    setColumnsOrder(columns.map((c) => c.key));
   }, [columns]);
 
-  const handleResizeStart = (e: React.MouseEvent<HTMLDivElement>, colKey: string) => {
+  const handleResizeStart = (
+    e: React.MouseEvent<HTMLDivElement>,
+    colKey: string
+  ) => {
     e.preventDefault();
     const startX = e.clientX;
     const startWidth = columnWidths[colKey] || 150;
@@ -87,10 +136,10 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
       if (!table) return;
       const deltaX = e.clientX - startX;
       const newWidth = Math.max(50, startWidth + deltaX);
-      
-      setColumnWidths(prev => ({
+
+      setColumnWidths((prev) => ({
         ...prev,
-        [colKey]: newWidth
+        [colKey]: newWidth,
       }));
     };
 
@@ -103,30 +152,34 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     window.addEventListener("mouseup", handleMouseUp);
   };
 
-  
   const handleDragStart = (e: React.DragEvent, colKey: string) => {
     e.dataTransfer.setData("text/plain", colKey);
     setDraggedColumn(colKey);
     e.currentTarget.classList.add("dragging");
   };
 
-  const handleDragOver = useCallback((e: React.DragEvent, targetColKey: string) => {
-    e.preventDefault();
-    if (!draggedColumn || draggedColumn === targetColKey) return;
+  const handleDragOver = useCallback(
+    (e: React.DragEvent, targetColKey: string) => {
+      e.preventDefault();
+      if (!draggedColumn || draggedColumn === targetColKey) return;
 
-    const newOrder = [...columnsOrder];
-    const sourceIndex = newOrder.indexOf(draggedColumn);
-    const targetIndex = newOrder.indexOf(targetColKey);
+      const newOrder = [...columnsOrder];
+      const sourceIndex = newOrder.indexOf(draggedColumn);
+      const targetIndex = newOrder.indexOf(targetColKey);
 
-    newOrder.splice(sourceIndex, 1);
-    newOrder.splice(targetIndex, 0, draggedColumn);
+      newOrder.splice(sourceIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedColumn);
 
-    setColumnsOrder(newOrder);
-  }, [columnsOrder, draggedColumn]);
+      setColumnsOrder(newOrder);
+    },
+    [columnsOrder, draggedColumn]
+  );
 
   const handleDragEnd = () => {
     setDraggedColumn(null);
-    document.querySelectorAll(".dragging").forEach(el => el.classList.remove("dragging"));
+    document
+      .querySelectorAll(".dragging")
+      .forEach((el) => el.classList.remove("dragging"));
   };
 
   const handleContextMenu = (e: React.MouseEvent, colKey: string) => {
@@ -134,61 +187,82 @@ const Table = <T extends Record<string, any>>(props: TableProps<T>) => {
     setContextMenu({
       colKey,
       x: e.clientX,
-      y: e.clientY
+      y: e.clientY,
     });
   };
   const isTextOverflowing = (key: string) => {
     const cell = cellRefs.current[key];
     return cell && cell.scrollWidth > cell.clientWidth;
   };
+const editedData = useMemo(() => {
+  return data.map((row, rowIndex) => {
+    const updatedRow = { ...row } as T;
+
+    for (const [key, value] of Object.entries(editedCells)) {
+      const [indexStr, colKey] = key.split("-");
+      if (parseInt(indexStr) === rowIndex) {
+        (updatedRow as any)[colKey] = value;
+      }
+    }
+
+    return updatedRow;
+  });
+}, [data, editedCells]);
+
+
   // Enhanced filtering with type-specific filters
-  const filteredData = useMemo(() => data.filter(row =>
+const filteredData = useMemo(() =>
+  editedData.filter((row) =>
     Object.entries(filters).every(([colKey, filterValue]) => {
-      const column = columns.find(c => c.key === colKey);
+      const column = columns.find((c) => c.key === colKey);
       const value = row[colKey];
-      
+
       if (column?.type === "number") {
         return Number(value) >= Number(filterValue);
       }
-      
+
       return String(value).toLowerCase().includes(filterValue.toLowerCase());
     }) &&
-    (globalSearch === "" || 
-      Object.values(row).some(value => 
+    (globalSearch === "" ||
+      Object.values(row).some((value) =>
         String(value).toLowerCase().includes(globalSearch.toLowerCase())
-      )
-    )
-  ), [data, filters, columns, globalSearch]);
-// Export to CSV
-const exportToCSV = () => {
-  const csvContent = [
-    // Join the column labels
-    columns.map(c => c.label).join(","),
-    
-    // Map through the rows and join values
-    ...sortedData.map(row => 
-      columns.map(c => 
-        // Use the correct template literal to replace quotes in cell data
-        `"${String(row[c.key]).replace(/"/g, '""')}"`
-      ).join(",")
-    )
-  ].join("\n");
+      ))
+  ), [editedData, filters, columns, globalSearch]);
 
-  // Create a Blob with the CSV content
-  const blob = new Blob([csvContent], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
-  
-  // Create an anchor element to trigger the download
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "data.csv";
-  a.click();
-  
-  // Clean up
-  window.URL.revokeObjectURL(url);
-};
+  // Export to CSV
+  const exportToCSV = () => {
+    const csvContent = [
+      // Join the column labels
+      columns.map((c) => c.label).join(","),
 
-  const sortedData = useMemo(() => sortColumn
+      // Map through the rows and join values
+      ...sortedData.map((row) =>
+        columns
+          .map(
+            (c) =>
+              // Use the correct template literal to replace quotes in cell data
+              `"${String(row[c.key]).replace(/"/g, '""')}"`
+          )
+          .join(",")
+      ),
+    ].join("\n");
+
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    // Create an anchor element to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "data.csv";
+    a.click();
+
+    // Clean up
+    window.URL.revokeObjectURL(url);
+  };
+
+const sortedData = useMemo(() =>
+  sortColumn
     ? [...filteredData].sort((a, b) => {
         const aValue = a[sortColumn];
         const bValue = b[sortColumn];
@@ -196,128 +270,215 @@ const exportToCSV = () => {
           ? String(aValue).localeCompare(String(bValue))
           : String(bValue).localeCompare(String(aValue));
       })
-    : filteredData, [filteredData, sortColumn, sortOrder]);
+    : filteredData,
+  [filteredData, sortColumn, sortOrder]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return sortedData.slice(startIndex, endIndex);
-  }, [sortedData, currentPage, rowsPerPage]);
 
-  const groupedData = useMemo(() => groupBy 
+const paginatedData = useMemo(() => {
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  return sortedData.slice(startIndex, endIndex);
+}, [sortedData, currentPage, rowsPerPage]);
+
+const groupedData = useMemo(() =>
+  groupBy
     ? paginatedData.reduce<Record<string, T[]>>((acc, row) => {
         const key = String(row[groupBy]);
         acc[key] = acc[key] || [];
         acc[key].push(row);
         return acc;
       }, {})
-    : { All: paginatedData }, [paginatedData, groupBy]);
+    : { All: paginatedData },
+  [paginatedData, groupBy]);
 
-    useEffect(() => {
-      const savedSettings = localStorage.getItem("tableSettings");
-      if (savedSettings) {
-        const { hidden, order } = JSON.parse(savedSettings);
-        setHiddenColumns(new Set(hidden));
-        setColumnsOrder(order);
-      }
-    }, []);
-  
-    const saveSettings = () => {
-      localStorage.setItem("tableSettings", JSON.stringify({
+  useEffect(() => {
+    const savedSettings = localStorage.getItem("tableSettings");
+    if (savedSettings) {
+      const { hidden, order } = JSON.parse(savedSettings);
+      setHiddenColumns(new Set(hidden));
+      setColumnsOrder(order);
+    }
+  }, []);
+
+  const saveSettings = () => {
+    localStorage.setItem(
+      "tableSettings",
+      JSON.stringify({
         hidden: Array.from(hiddenColumns),
-        order: columnsOrder
-      }));
-    };
-    const contextMenuOptions = [
-      { label: "Hide Column", icon: <FiX />, action: () => setHiddenColumns(prev => new Set([...prev, contextMenu!.colKey])) },
-      { label: "Freeze Column", icon: <FiSliders />, action: () => {/* Implement freezing logic */} },
-      { label: "Reset Width", icon: <FiSettings />, action: () => setColumnWidths(prev => ({ ...prev, [contextMenu!.colKey]: 150 })) },
-      { label: "Copy Key", icon: <FiCopy />, action: () => navigator.clipboard.writeText(contextMenu!.colKey) },
-    ];
-  
-    // Loading skeleton
-    const renderLoadingRows = () => (
-      Array.from({ length: rowsPerPage }).map((_, i) => (
-        <tr key={i} className="animate-pulse">
-          <td className="p-3 border-b border-gray-200 text-center">
-            <div className="h-4 bg-gray-200 rounded mx-auto w-4" />
-          </td>
-          {columnsOrder.map(colKey => (
-            <td key={colKey} className="p-3 border-b border-gray-200">
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-            </td>
-          ))}
-        </tr>
-      ))
+        order: columnsOrder,
+      })
     );
-    
+  };
+
+  // Loading skeleton
+  const renderLoadingRows = () =>
+    Array.from({ length: rowsPerPage }).map((_, i) => (
+      <tr key={i} className="animate-pulse">
+        <td className="p-3 border-b border-gray-200 text-center">
+          <div className="h-4 bg-gray-200 rounded mx-auto w-4" />
+        </td>
+        {columnsOrder.map((colKey) => (
+          <td key={colKey} className="p-3 border-b border-gray-200">
+            <div className="h-4 bg-gray-200 rounded w-3/4" />
+          </td>
+        ))}
+      </tr>
+    ));
+
   return (
-    <div className="overflow-x-auto bg-white shadow-xl rounded-xl border border-gray-200 h-full relative">
+    <div
+      className={clsx(
+        "overflow-x-auto shadow-xl rounded-xl border h-full relative",
+        isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+      )}
+    >
       {/* Table Controls */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-        <div className="flex items-center space-x-4">
-          <input
-            type="search"
-            placeholder="Global Search..."
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            value={globalSearch}
-            onChange={(e) => setGlobalSearch(e.target.value)}
-          />
-          
+      <div
+        className={clsx(
+          "p-4 border-b flex items-center justify-between",
+          isDark ? "bg-gray-800 border-gray-700" : "bg-gray-50 border-gray-200"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          {/* Enhanced Search Input */}
+          <div className="relative flex-1 max-w-md">
+            <FiSearch
+              className={clsx(
+                "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",
+                isDark ? "text-gray-500" : "text-gray-400"
+              )}
+            />
+            <input
+              type="search"
+              placeholder="Search across all columns..."
+              className={clsx(
+                "w-full pl-10 pr-4 py-2.5 text-sm border rounded-xl transition-all shadow-sm",
+                isDark
+                  ? "bg-gray-700 text-gray-200 border-gray-600 placeholder-gray-500 focus:ring-indigo-500/60 focus:border-indigo-500"
+                  : "bg-white text-gray-900 border-gray-200 placeholder-gray-400 focus:ring-indigo-500/60 focus:border-indigo-500 hover:border-gray-300"
+              )}
+              value={globalSearch}
+              onChange={(e) => setGlobalSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Column Settings Dropdown */}
           <Menu as="div" className="relative">
-            <Menu.Button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center">
-              <FiSettings className="mr-2" /> Columns
+            <Menu.Button
+              className={clsx(
+                "flex items-center space-x-2 px-4 py-2.5 text-sm font-medium border rounded-xl transition-colors duration-200",
+                isDark
+                  ? "bg-gray-700 text-gray-300 border-gray-600 hover:border-gray-500 hover:bg-gray-600"
+                  : "bg-white text-indigo-600 border-indigo-100 hover:border-indigo-200 hover:bg-indigo-50/50"
+              )}
+            >
+              <FiSettings className="w-4 h-4" />
+              <span>Columns</span>
+              <FiChevronDown className="w-4 h-4 transition-transform ui-open:rotate-180" />
             </Menu.Button>
+
             <Transition
               enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
               leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
             >
-              <Menu.Items className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md p-2 z-50">
-                {columns.map(col => (
-                  <Menu.Item key={col.key}>
-                    {({ active }) => (
-                      <label className={`flex items-center px-3 py-2 rounded cursor-pointer ${active ? 'bg-gray-100' : ''}`}>
-                        <input
-                          type="checkbox"
-                          checked={!hiddenColumns.has(col.key)}
-                          onChange={() => setHiddenColumns(prev => {
-                            const newSet = new Set(prev);
-                            newSet.has(col.key) ? newSet.delete(col.key) : newSet.add(col.key);
-                            saveSettings();
-                            return newSet;
-                          })}
-                          className="form-checkbox h-4 w-4 text-indigo-600 mr-2"
-                        />
-                        <span>{col.label}</span>
-                      </label>
-                    )}
-                  </Menu.Item>
-                ))}
+              <Menu.Items
+                className={clsx(
+                  "absolute right-0 mt-2 w-56 border rounded-lg shadow-lg ring-1 focus:outline-none z-50",
+                  isDark
+                    ? "bg-gray-700 border-gray-600 ring-black/10"
+                    : "bg-white border-gray-100 ring-black/5"
+                )}
+              >
+                <div className="p-2 space-y-1">
+                  {columns.map((col) => (
+                    <Menu.Item key={col.key}>
+                      {({ active }) => (
+                        <label
+                          className={clsx(
+                            "flex items-center px-3 py-2 rounded-md cursor-pointer transition-colors",
+                            active &&
+                              (isDark ? "bg-gray-600" : "bg-indigo-50/50")
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!hiddenColumns.has(col.key)}
+                            onChange={() => {
+                              const newSet = new Set(hiddenColumns);
+                              newSet.has(col.key)
+                                ? newSet.delete(col.key)
+                                : newSet.add(col.key);
+                              saveSettings();
+                              setHiddenColumns(newSet);
+                            }}
+                            className={clsx(
+                              "form-checkbox h-4 w-4 rounded border transition-colors",
+                              isDark
+                                ? "text-indigo-400 border-gray-500 focus:ring-indigo-500/60"
+                                : "text-indigo-600 border-gray-300 focus:ring-indigo-500/60"
+                            )}
+                          />
+                          <span
+                            className={clsx(
+                              "ml-2.5 text-sm",
+                              isDark ? "text-gray-300" : "text-gray-700"
+                            )}
+                          >
+                            {col.label}
+                          </span>
+                        </label>
+                      )}
+                    </Menu.Item>
+                  ))}
+                </div>
               </Menu.Items>
             </Transition>
           </Menu>
 
+          {/* Export Button */}
           <button
             onClick={exportToCSV}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center"
+            className={clsx(
+              "flex items-center space-x-2 px-4 py-2.5 text-sm font-medium border rounded-xl transition-colors duration-200",
+              isDark
+                ? "bg-gray-700 text-emerald-400 border-gray-600 hover:border-gray-500 hover:bg-gray-600"
+                : "bg-white text-emerald-600 border-emerald-100 hover:border-emerald-200 hover:bg-emerald-50/50"
+            )}
           >
-            <FiDownload className="mr-2" /> Export
+            <FiDownload className="w-4 h-4" />
+            <span>Export CSV</span>
           </button>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span>Rows per page:</span>
+          <label
+            htmlFor="rowsPerPage"
+            className={clsx(
+              "text-sm font-medium",
+              isDark ? "text-gray-300" : "text-gray-700"
+            )}
+          >
+            Rows per page:
+          </label>
           <select
+            id="rowsPerPage"
             value={rowsPerPage}
             onChange={(e) => setRowsPerPage(Number(e.target.value))}
-            className="px-2 py-1 border rounded-md"
+            className={clsx(
+              "px-3 py-1 border rounded-md shadow-sm focus:outline-none focus:ring-1 transition ease-in-out duration-150",
+              isDark
+                ? "bg-gray-700 text-gray-200 border-gray-600 focus:ring-indigo-500 focus:border-indigo-500"
+                : "bg-white text-gray-900 border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+            )}
           >
-            {rowsPerPageOptions.map(option => (
-              <option key={option} value={option}>{option}</option>
+            {rowsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
             ))}
           </select>
         </div>
@@ -325,254 +486,240 @@ const exportToCSV = () => {
 
       <table ref={tableRef} className="w-full text-sm text-left text-gray-700">
         {/* Table Header */}
-        <thead className="sticky top-0 bg-indigo-50 shadow-sm">
+        <thead
+          className={clsx(
+            "sticky top-0 shadow-sm",
+            isDark
+              ? "bg-gray-800 border-gray-600"
+              : "bg-indigo-50 border-gray-200"
+          )}
+        >
           <tr>
-            <th className="p-3 border-b border-gray-200 text-center sticky left-0 bg-indigo-50 z-20" style={{ width: 60 }}>
-              <input
-                type="checkbox"
-                className="form-checkbox h-5 w-5 text-indigo-600 rounded"
-                checked={selectedRows.size === data.length}
-                onChange={() => setSelectedRows?.(selectedRows.size === data.length ? new Set() : new Set(data.map((_, i) => i)))}
-              />
+            {/* Checkbox header */}
+
+            <th
+              className={clsx(
+                "sticky left-0 z-20 border-b",
+                isDark
+                  ? "bg-gray-800 border-gray-600"
+                  : "bg-indigo-50 border-gray-200"
+              )}
+              style={{ width: columnWidths["checkbox"] || 60 }}
+            >
+              <div className="flex items-center justify-center p-3">
+                <input
+                  type="checkbox"
+                  className={clsx(
+                    "w-5 h-5 rounded form-checkbox",
+                    isDark ? "text-gray-400" : "text-indigo-600"
+                  )}
+                  checked={selectedRows.size === data.length}
+                  onChange={() =>
+                    setSelectedRows?.(
+                      selectedRows.size === data.length
+                        ? new Set()
+                        : new Set(data.map((e) => e))
+                    )
+                  }
+                />
+              </div>
             </th>
-            {columnsOrder.map(colKey => {
-              const col = columns.find(c => c.key === colKey);
+
+            {columnsOrder.map((colKey) => {
+              const col = columns.find((c) => c.key === colKey);
               if (!col || hiddenColumns.has(colKey)) return null;
 
               return (
                 <th
                   key={col.key}
-                  className={`p-3 border-b border-gray-200 group ${col.frozen ? 'sticky left-12 z-10 bg-indigo-50' : ''}`}
+                  className={clsx(
+                    "group relative p-0 border-b",
+                    isDark ? "border-gray-600" : "border-gray-200",
+                    col.frozen &&
+                      clsx(
+                        isDark ? "bg-gray-800" : "bg-indigo-50",
+                        "sticky left-12 z-10"
+                      )
+                  )}
                   style={{ width: columnWidths[col.key] || 150 }}
-
                   onContextMenu={(e) => handleContextMenu(e, col.key)}
-                  onDragOver={(e) => col.reorderable && handleDragOver(e, col.key)}
+                  onDragOver={(e) =>
+                    col.reorderable && handleDragOver(e, col.key)
+                  }
                 >
-                  <div className="flex items-center justify-between">
-                    <div 
-                      className="flex items-center flex-1"
-                      draggable={col.reorderable}
-                      onDragStart={(e) => col.reorderable && handleDragStart(e, col.key)}
-                      onDragEnd={handleDragEnd}
-                    >
-                      {col.reorderable && (
-                        <span className="mr-2 cursor-move opacity-0 group-hover:opacity-100">⠿</span>
+                  {/* Header Content Container */}
+                  <div
+                    className={clsx(
+                      "flex flex-col h-full p-2 transition-colors",
+                      isDark ? "hover:bg-gray-700" : "hover:bg-indigo-100/50"
+                    )}
+                  >
+                    {/* Column Label and Controls */}
+                    <div className="flex items-center justify-between mb-1">
+                      <div
+                        className="flex items-center flex-1 gap-1"
+                        draggable={col.reorderable}
+                        onDragStart={(e) =>
+                          col.reorderable && handleDragStart(e, col.key)
+                        }
+                        onDragEnd={handleDragEnd}
+                      >
+                        {col.reorderable && (
+                          <span
+                            className={clsx(
+                              "cursor-move opacity-0 group-hover:opacity-100",
+                              isDark ? "text-gray-500" : "text-gray-400"
+                            )}
+                          >
+                            ⠿
+                          </span>
+                        )}
+                        <span
+                          className={clsx(
+                            "font-medium",
+                            isDark ? "text-gray-200" : "text-gray-700"
+                          )}
+                        >
+                          {col.label}
+                        </span>
+                      </div>
+
+                      {col.sortable && (
+                        <button
+                          onClick={() => {
+                            if (sortColumn === col.key) {
+                              setSortOrder((prev) =>
+                                prev === "asc" ? "desc" : "asc"
+                              );
+                            } else {
+                              setSortColumn(col.key);
+                              setSortOrder("asc");
+                            }
+                          }}
+                          className={clsx(
+                            "p-1 rounded",
+                            isDark
+                              ? "hover:bg-gray-700 text-gray-400"
+                              : "hover:bg-indigo-100 text-indigo-600"
+                          )}
+                          aria-label={`Sort by ${col.label}`}
+                        >
+                          {sortColumn === col.key ? (
+                            sortOrder === "asc" ? (
+                              <FiChevronUp className="w-4 h-4" />
+                            ) : (
+                              <FiChevronDown className="w-4 h-4" />
+                            )
+                          ) : (
+                            <PiCaretUpDownFill className="w-4 h-4 opacity-30" />
+                          )}
+                        </button>
                       )}
-                      <span>{col.label}</span>
                     </div>
 
-                    {col.sortable && (
-                      <button 
-                        onClick={() => {
-                          if (sortColumn === col.key) {
-                            setSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                          } else {
-                            setSortColumn(col.key);
-                            setSortOrder("asc");
+                    {/* Filter Input */}
+                    {col.filterable && (
+                      <div className="px-1 pb-1">
+                        <input
+                          type={col.type === "number" ? "number" : "search"}
+                          placeholder="Filter..."
+                          className={clsx(
+                            "w-full px-2 py-1 text-xs border-none rounded-md",
+                            isDark
+                              ? "bg-gray-700 text-gray-300 placeholder-gray-400"
+                              : "bg-white text-gray-900 placeholder-gray-500"
+                          )}
+                          onChange={(e) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              [col.key]: e.target.value,
+                            }))
                           }
-                        }}
-                        className="ml-2"
-                      >
-                        {sortColumn === col.key ? (
-                          sortOrder === "asc" ? <FiChevronUp /> : <FiChevronDown />
-                        ) : <FiChevronUp className="opacity-30" />}
-                      </button>
+                          aria-label={`Filter ${col.label}`}
+                        />
+                      </div>
+                    )}
+
+                    {/* Resize Handle */}
+                    {col.resizable && (
+                      <div
+                        onMouseDown={(e) => handleResizeStart(e, col.key)}
+                        className={clsx(
+                          "absolute top-0 bottom-0 right-0 w-1 transition-colors cursor-col-resize opacity-0 group-hover:opacity-100",
+                          isDark
+                            ? "bg-gray-600 hover:bg-gray-400"
+                            : "bg-gray-300 hover:bg-indigo-500"
+                        )}
+                      />
                     )}
                   </div>
-
-                  {col.resizable && (
-                    <div
-                      onMouseDown={(e) => handleResizeStart(e, col.key)}
-                      className="cursor-col-resize w-1 h-full bg-gray-400 absolute right-0 top-0 bottom-0 hover:bg-blue-500 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
-                    />
-                  )}
-
-                  {col.filterable && (
-                    <input
-                      type={col.type === "number" ? "number" : "search"}
-                      placeholder="Filter"
-                      className="mt-1 block w-full border border-gray-300 rounded-md px-2 py-1 text-xs"
-                      onChange={(e) => setFilters(prev => ({ ...prev, [col.key]: e.target.value }))}
-                    />
-                  )}
-             </th>
+                </th>
               );
             })}
-            <th className="p-3 border-b border-gray-200 sticky right-0 bg-indigo-50">Actions</th>
           </tr>
         </thead>
 
-
         <tbody>
-          {loading ? renderLoadingRows() : Object.entries(groupedData).map(([group, rows]) => (
-            <React.Fragment key={group}>
-              {/* Group header */}
-              <tr 
-                className="bg-indigo-50 cursor-pointer hover:bg-indigo-100"
-                onClick={() => setCollapsedGroups(prev => {
-                  const newSet = new Set(prev);
-                  newSet.has(group) ? newSet.delete(group) : newSet.add(group);
-                  return newSet;
-                })}
-              >
-                <td colSpan={columnsOrder.length + 2} className="p-3 border-b border-gray-200 font-medium">
-                  <FiChevronDown className={`inline-block transform ${collapsedGroups.has(group) ? 'rotate-180' : ''}`} />
-                  <span className="ml-2 text-indigo-700">{group}</span>
-                </td>
-              </tr>
-              
-              {/* Table rows */}
-              {!collapsedGroups.has(group) && rows.map((row, rowIndex) => (
-                <tr
-                  key={rowIndex}
-                  className={`hover:bg-gray-50 ${selectedRows.has(rowIndex) ? 'bg-indigo-50' : ''}`}
-                  onMouseEnter={() => setHoveredRow(rowIndex)}
-                  onMouseLeave={() => setHoveredRow(null)}
-                >
-                  {/* Checkbox cell */}
-                  <td className="p-3 border-b border-gray-200 text-center sticky left-0 bg-white z-10">
-                    <input
-                      type="checkbox"
-                      className="form-checkbox h-4 w-4 text-indigo-600 rounded"
-                      checked={selectedRows.has(rowIndex)}
-                      onChange={() => setSelectedRows?.(prev => {
-                        const newSet = new Set(prev);
-                        newSet.has(rowIndex) ? newSet.delete(rowIndex) : newSet.add(rowIndex);
-                        return newSet;
-                      })}
-                    />
-                  </td>
+          {loading
+            ? renderLoadingRows()
+            : Object.entries(groupedData).map(([group, rows]) => (
+                <React.Fragment key={group}>
+                  {/* Group header */}
+                  <GroupHeader
+                    group={group}
+                    columnsOrder={columnsOrder}
+                    collapsedGroups={collapsedGroups}
+                    setCollapsedGroups={setCollapsedGroups}
+                    mode="light"
+                  />
 
-                  {columnsOrder.map(colKey => {
-                    const col = columns.find(c => c.key === colKey);
-                    if (!col || hiddenColumns.has(colKey)) return null;
-                    const cellKey = `${rowIndex}-${colKey}`;
-                    const value = editedCells[cellKey] ?? row[col.key];
-
-                    return (
-                      <td
-                        key={colKey}
-                        className="p-3 border-b border-gray-300 relative group"
-                        ref={el => cellRefs.current[colKey] = el}
-                      >
-                        {col.editable ? (
-                          <input
-                            type={col.type || "text"}
-                            value={String(value)}
-                            onChange={(e) => {
-                              setEditedCells(prev => ({
-                                ...prev,
-                                [cellKey]: e.target.value
-                              }));
-                              onEdit?.(rowIndex, row, { ...row, [colKey]: e.target.value });
-                            }}
-                            className="border rounded px-2 py-1 text-xs w-full"
-                          />
-                        ) : col.render ? (
-                          col.render(value, row)
-                        ) : (
-                          <div className="truncate">
-                            {String(value)}
-                            {isTextOverflowing(colKey) && (
-                              <div className="absolute left-0 top-full mt-1 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                                {String(value)}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-             <td className="p-3 border-b border-gray-200 sticky right-0 bg-white">
-                    <Menu as="div" className="relative">
-                      <Menu.Button className="text-gray-500 hover:text-indigo-600">
-                        <FiSliders className="transform rotate-90" />
-                      </Menu.Button>
-                      <Transition
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
-                        <Menu.Items className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md p-2 z-50">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                className={`flex items-center w-full px-3 py-2 rounded ${active ? 'bg-indigo-50 text-indigo-700' : ''}`}
-                                onClick={() => onDuplicateRow?.(row)}
-                              >
-                                <FiCopy className="mr-2" /> Duplicate
-                              </button>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                className={`flex items-center w-full px-3 py-2 rounded ${active ? 'bg-indigo-50 text-indigo-700' : ''}`}
-                                onClick={() => onDeleteRow?.(row)}
-                              >
-                                <FiTrash className="mr-2" /> Delete
-                              </button>
-                            )}
-                          </Menu.Item>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
-                  </td>
-                </tr>
+                  {/* Table rows */}
+                  {!collapsedGroups.has(group) && (
+                  <GroupedRows
+                  group={group}
+                  rows={rows}
+                  columnsOrder={columnsOrder}
+                  columns={columns}
+                  hiddenColumns={hiddenColumns}
+                  selectedRows={selectedRows}
+                  setSelectedRows={setSelectedRows}
+                  setHoveredRow={setHoveredRow}
+                  editedCells={editedCells}
+                  setEditedCells={setEditedCells}
+                  onEdit={onEdit}
+                  onDuplicateRow={onDuplicateRow}
+                  onDeleteRow={onDeleteRow}
+                  isTextOverflowing={isTextOverflowing}
+                  cellRefs={cellRefs}
+                  collapsedGroups={collapsedGroups}
+                  mode="light" // or "dark" depending on the theme
+                  focusedRowIndex={focusedRowIndex}
+                  setFocusedRowIndex={setFocusedRowIndex}
+                  setFocusedRowData={setFocusedRowData}
+                />
+                  )}
+                </React.Fragment>
               ))}
-            </React.Fragment>
-          ))}
         </tbody>
-
       </table>
 
-       {/* Empty State */}
-       {!loading && filteredData.length === 0 && (
-        <div className="p-8 text-center text-gray-500">
-          <div className="text-2xl mb-2">📭</div>
-          No data found
-        </div>
-      )}
+      {/* Empty State */}
+      {!loading && filteredData.length === 0 && <EmptyState mode="light" />}
 
       {/* Footer */}
-      <div className="sticky bottom-0 bg-white border-t p-3 flex justify-between items-center shadow-lg">
-        <div className="flex items-center space-x-4">
-          {selectedRows.size > 0 && (
-            <div className="flex items-center space-x-2">
-              <span>{selectedRows.size} selected</span>
-              <button
-                className="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg"
-                onClick={() => {/* Implement bulk delete */}}
-              >
-                <FiTrash className="inline-block mr-1" /> Delete Selected
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <button
-              className="px-3 py-1 border rounded-lg hover:bg-gray-50"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span>Page {currentPage} of {Math.ceil(filteredData.length / rowsPerPage)}</span>
-            <button
-              className="px-3 py-1 border rounded-lg hover:bg-gray-50"
-              onClick={() => setCurrentPage(p => Math.min(p + 1, Math.ceil(filteredData.length / rowsPerPage)))}
-              disabled={currentPage === Math.ceil(filteredData.length / rowsPerPage)}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
+      <TableFooter
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        filteredDataLength={filteredData.length}
+        rowsPerPage={rowsPerPage}
+        selectedRows={selectedRows}
+          
+  setRowsPerPage={setRowsPerPage}
+        setSelectedRows={() => {
+          setSelectedRows?.(new Set());
+        }}
+        mode="light"
+      />
     </div>
   );
 };

@@ -328,38 +328,76 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   };
   export const TreeViewSvg: React.FC = () => {
     return (
-      <svg width="300" height="150" xmlns="http://www.w3.org/2000/svg">
-        {/* Background rectangle with subtle animation */}
-        <rect x="10" y="10" width="280" height="130" rx="10" ry="10" fill="#f0f0f0" opacity="0.8">
-          <animate attributeName="opacity" from="0.8" to="1" dur="2s" repeatCount="indefinite" />
-        </rect>
-        <rect x="10" y="10" width="280" height="130" rx="10" ry="10" stroke="#ccc" strokeWidth="1" fill="none" />
+      <div style={{ 
+        maxWidth: '800px', 
+        margin: '0 auto',
+        padding: '20px',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <svg 
+          viewBox="0 0 300 200" 
+          preserveAspectRatio="xMidYMid meet"
+          style={{ width: '100%', height: 'auto' }}
+        >
+          {/* Main tree structure */}
+          <g className="tree">
+            {/* Root Node */}
+            <g className="node" transform="translate(150, 30)">
+              <circle r="15" fill="#2196F3" className="node-circle" />
+              <text x="0" y="5" textAnchor="middle" fill="white" fontSize="12">Root</text>
+            </g>
   
-        {/* Left tree structure */}
-        <circle cx="50" cy="40" r="8" fill="#4CAF50" opacity="0.8">
-          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="50" cy="70" r="8" fill="#4CAF50" opacity="0.8">
-          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="50" cy="100" r="8" fill="#4CAF50" opacity="0.8">
-          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
-        </circle>
-        <line x1="50" y1="40" x2="50" y2="70" stroke="#4CAF50" strokeWidth="2" />
-        <line x1="50" y1="70" x2="50" y2="100" stroke="#4CAF50" strokeWidth="2" />
+            {/* First Level */}
+            <g className="node" transform="translate(80, 80)">
+              <line x1="150" y1="45" x2="80" y2="80" stroke="#90CAF9" strokeWidth="2" />
+              <circle r="12" fill="#4CAF50" className="node-circle" />
+              <text x="0" y="4" textAnchor="middle" fill="white" fontSize="11">Node 1</text>
+            </g>
   
-        {/* Right tree structure */}
-        <circle cx="200" cy="40" r="8" fill="#2196F3" opacity="0.8">
-          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
-        </circle>
-        <circle cx="200" cy="70" r="8" fill="#2196F3" opacity="0.8">
-          <animate attributeName="opacity" from="0.8" to="1" dur="1s" repeatCount="indefinite" />
-        </circle>
-        <line x1="200" y1="40" x2="200" y2="70" stroke="#2196F3" strokeWidth="2" />
+            <g className="node" transform="translate(220, 80)">
+              <line x1="150" y1="45" x2="220" y2="80" stroke="#90CAF9" strokeWidth="2" />
+              <circle r="12" fill="#FF9800" className="node-circle" />
+              <text x="0" y="4" textAnchor="middle" fill="white" fontSize="11">Node 2</text>
+            </g>
   
-        {/* Ground line */}
-        <rect x="10" y="120" width="280" height="10" rx="5" ry="5" fill="#ccc" opacity="0.6" />
-      </svg>
+            {/* Second Level */}
+            <g className="node" transform="translate(40, 130)">
+              <line x1="80" y1="92" x2="40" y2="130" stroke="#A5D6A7" strokeWidth="2" />
+              <circle r="10" fill="#4CAF50" className="node-circle" />
+              <text x="0" y="3" textAnchor="middle" fill="white" fontSize="10">Child 1</text>
+            </g>
+  
+            <g className="node" transform="translate(120, 130)">
+              <line x1="80" y1="92" x2="120" y2="130" stroke="#A5D6A7" strokeWidth="2" />
+              <circle r="10" fill="#4CAF50" className="node-circle" />
+              <text x="0" y="3" textAnchor="middle" fill="white" fontSize="10">Child 2</text>
+            </g>
+  
+            <g className="node" transform="translate(260, 130)">
+              <line x1="220" y1="92" x2="260" y2="130" stroke="#FFB74D" strokeWidth="2" />
+              <circle r="10" fill="#FF9800" className="node-circle" />
+              <text x="0" y="3" textAnchor="middle" fill="white" fontSize="10">Child 3</text>
+            </g>
+          </g>
+  
+          <style jsx>{`
+            .node-circle {
+              transition: transform 0.2s ease;
+              filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            }
+            
+            .node:hover .node-circle {
+              transform: scale(1.1);
+              cursor: pointer;
+            }
+            
+            text {
+              pointer-events: none;
+              user-select: none;
+            }
+          `}</style>
+        </svg>
+      </div>
     );
   };
   export const PopupSvg: React.FC = () => {
@@ -912,35 +950,163 @@ export const CalendarIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => 
   );
 };
 // Autocomplete Icon
-export const AutocompleteIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
+
+
+interface PagnitionIconProps {
+  className?: string;
+}
+
+export const PagnitionIcon: React.FC<PagnitionIconProps> = ({ className = "w-6 h-6" }) => {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Background shape */}
+      <rect x="2" y="2" width="20" height="20" rx="3" fill="currentColor" />
+      {/* Left arrow */}
+      <path
+        d="M8 12l4-4v8l-4-4z"
+        fill="white"
+      />
+      {/* Right arrow */}
+      <path
+        d="M16 12l-4 4V8l4 4z"
+        fill="white"
+      />
+    </svg>
+  );
+};
+
+export const PopupIcon: React.FC<PagnitionIconProps> = ({ className = "w-6 h-6" }) => {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Popup window rectangle */}
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+      {/* Popup pointer (triangle) */}
+      <polygon points="12,21 8,17 16,17" />
+    </svg>
+  );
+};
+export const StepperIcon: React.FC<PagnitionIconProps> = ({ className = "w-8 h-8" }) => {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 64 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Horizontal line connecting the steps */}
+      <line
+        x1="16"
+        y1="8"
+        x2="48"
+        y2="8"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      {/* First step: filled circle (active/completed) */}
+      <circle cx="8" cy="8" r="4" fill="currentColor" />
+      {/* Second step: outlined circle */}
+      <circle
+        cx="32"
+        cy="8"
+        r="4"
+        fill="white"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      {/* Third step: outlined circle */}
+      <circle
+        cx="56"
+        cy="8"
+        r="4"
+        fill="white"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </svg>
+  );
+};
+export const CustomTableIcon = ({ className = 'w-6 h-6' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Table top */}
+    <rect x="3" y="3" width="18" height="2" fill="currentColor" />
+    {/* Table legs */}
+    <rect x="5" y="5" width="2" height="16" fill="currentColor" />
+    <rect x="17" y="5" width="2" height="16" fill="currentColor" />
+    {/* Table rows */}
+    <rect x="3" y="9" width="18" height="2" fill="currentColor" />
+    <rect x="3" y="15" width="18" height="2" fill="currentColor" />
+  </svg>
+);
+export const ToastIcon = ({ className = 'w-6 h-6', fillColor = '#000' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill={fillColor}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* SVG path data goes here */}
+    <path d="M12 2C7.58 2 4 4.58 4 8v8c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V8c0-3.42-3.58-6-8-6zm0 2c3.87 0 6 2.13 6 4H6c0-1.87 2.13-4 6-4zm-6 6h12v8c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-8z" />
+  </svg>
+);
+export const AutocompleteIcon = ({ className = 'w-6 h-6', fillColor = '#000' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill={fillColor}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* SVG path data goes here */}
+    <path d="M10 2a8 8 0 106.32 12.9l4.39 4.39a1 1 0 001.41-1.41l-4.39-4.39A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12zm-1 3v2H7a1 1 0 000 2h2v2a1 1 0 002 0v-2h2a1 1 0 000-2h-2V7a1 1 0 00-2 0z" />
+  </svg>
+);
+export const TreeViewIcon = ({ className = 'w-6 h-6', fillColor = '#000' }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill={fillColor}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Replace the path data below with the actual path data from your SVG */}
+    <path d="M12 2C7.58 2 4 4.58 4 8v8c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V8c0-3.42-3.58-6-8-6zm0 2c3.87 0 6 2.13 6 4H6c0-1.87 2.13-4 6-4zm-6 6h12v8c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2v-8z" />
+  </svg>
+);
+export const ChartIcon = ({ type = 'bar' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    {...props}
+    fill="#000"
   >
-    {/* Background rectangle with subtle shadow */}
-    <rect x="3" y="4" width="18" height="12" rx="2" ry="2" fill="white" stroke="#ddd" />
-    
-    {/* Magnifying glass circle */}
-    <circle cx="17" cy="12" r="4" stroke="#555" fill="none" />
-    
-    {/* Magnifying glass handle */}
-    <line x1="19" y1="14" x2="21.5" y2="16.5" stroke="#555" strokeWidth="1.5" />
-    
-    {/* Optional: Add a subtle animation to the handle */}
-    <animateTransform
-      attributeName="transform"
-      type="rotate"
-      from="0 17 12"
-      to="5 17 12"
-      dur="1s"
-      repeatCount="indefinite"
-      additive="sum"
-    />
+    {type === 'bar' ? (
+      <>
+        {/* Bar chart icon */}
+        <rect x="3" y="10" width="4" height="10" />
+        <rect x="10" y="6" width="4" height="14" />
+        <rect x="17" y="2" width="4" height="18" />
+      </>
+    ) : (
+      <>
+        {/* Line chart icon */}
+        <path d="M3 17l6-6 4 4 8-8" stroke="currentColor" strokeWidth="2" fill="none" />
+        <circle cx="9" cy="11" r="1.5" />
+        <circle cx="13" cy="15" r="1.5" />
+        <circle cx="21" cy="7" r="1.5" />
+      </>
+    )}
   </svg>
 );
