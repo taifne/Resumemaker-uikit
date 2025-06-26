@@ -8,6 +8,7 @@ import {
   Image,
   Link,
 } from "@react-pdf/renderer";
+import { formatDate } from "../../../helper/date-time-helper";
 
 // Modern Swiss Design Styles
 const styles = StyleSheet.create({
@@ -144,16 +145,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// Helper: Format dates
-const formatDate = (date: Date | null) =>
-  date
-    ? new Date(date).toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      })
-    : "Present";
-
-// Modern Swiss Template Component
 const ModernSwissResumeTemplate: React.FC<{ resume: any }> = ({ resume }) => (
   <Document>
     <Page size="A4" style={styles.page}>

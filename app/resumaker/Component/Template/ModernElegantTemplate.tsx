@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet
 } from "@react-pdf/renderer";
+import { formatDate } from "../../../helper/date-time-helper";
 
 // STYLES
 const styles = StyleSheet.create({
@@ -173,14 +174,5 @@ const ModernElegantTemplate: React.FC<{ resume: any }> = ({ resume }) => (
     </Page>
   </Document>
 );
-
-// HELPER
-const formatDate = (date: Date | null | undefined) => {
-  if (!date) return "Present";
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-  });
-};
 
 export default ModernElegantTemplate;

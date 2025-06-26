@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Link
 } from "@react-pdf/renderer";
+import { formatDate } from "../../../helper/date-time-helper";
 
 // STYLES
 const styles = StyleSheet.create({
@@ -154,15 +155,6 @@ const HarvardTemplate: React.FC<{ resume: any }> = ({ resume }) => (
     </Page>
   </Document>
 );
-
-// HELPERS
-const formatDate = (date: Date | null | undefined) => {
-  if (!date) return "Present";
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-  });
-};
 
 // INTEGRATE INTO BASE
 const HavardBaseResumePdf: React.FC<{ resume: any }> = ({ resume }) => {

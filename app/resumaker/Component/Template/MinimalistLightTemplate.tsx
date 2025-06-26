@@ -8,6 +8,7 @@ import {
   Image,
   Link,
 } from "@react-pdf/renderer";
+import { formatDate } from "../../../helper/date-time-helper";
 const MinimalistLightTemplate: React.FC<{ resume: any }> = ({ resume }) => {
   const styles = StyleSheet.create({
     page: {
@@ -177,11 +178,4 @@ const MinimalistLightTemplate: React.FC<{ resume: any }> = ({ resume }) => {
     </Document>
   );
 };
-
-const formatDate = (date: Date | null | undefined) => {
-  if (!date) return "Present";
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-  });
-};export default MinimalistLightTemplate;
+;export default MinimalistLightTemplate;

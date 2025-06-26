@@ -34,7 +34,7 @@ const ExperienceInput: React.FC<ExperienceInputProps> = ({
   const handleExperienceChange = (
     index: number, 
     field: keyof Experience, 
-    value: string | Date | null
+    value:any
   ) => {
     const newExperiences = [...experiences];
     newExperiences[index] = {
@@ -171,6 +171,80 @@ const formatDateForInput = (date: Date | null): string => {
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
+              <div className="mb-2">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Description
+  </label>
+  <textarea
+    value={exp.description}
+    onChange={(e) =>
+      handleExperienceChange(index, "description", e.target.value)
+    }
+    placeholder="Describe your responsibilities and achievements"
+    rows={3}
+    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
+  />
+</div>
+
+{/* NEW: Achievements input */}
+<div className="mb-2">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Achievements
+  </label>
+  <div className="space-y-2">
+    {exp.achievements?.map((ach, achIndex) => (
+      <div key={achIndex} className="flex gap-2 items-center">
+        <Input
+          value={ach}
+          onChange={(value) => {
+            const newAchievements = exp.achievements ? [...exp.achievements] : [];
+            newAchievements[achIndex] = value;
+            handleExperienceChange(index, "achievements", newAchievements);
+          }}
+          placeholder={`Achievement ${achIndex + 1}`}
+          size="sm"
+          className="flex-1"
+        />
+        <button
+          type="button"
+          onClick={() => {
+            const newAchievements = (exp.achievements || []).filter(
+              (_, i) => i !== achIndex
+            );
+            handleExperienceChange(index, "achievements", newAchievements);
+          }}
+          className="text-red-500 hover:text-red-700"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M6 6a1 1 0 011 1v6a1 1 0 102 0V7a1 1 0 00-1-1H6zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V6a1 1 0 00-1-1h-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    ))}
+    <button
+      type="button"
+      onClick={() => {
+        const newAchievements = exp.achievements
+          ? [...exp.achievements, ""]
+          : [""];
+        handleExperienceChange(index, "achievements", newAchievements);
+      }}
+      className="text-blue-600 hover:text-blue-800 text-sm"
+    >
+      + Add Achievement
+    </button>
+  </div>
+</div>
+
             </div>
           ))}
         </div>

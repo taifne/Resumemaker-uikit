@@ -8,6 +8,7 @@ import {
   Link,
   Font,
 } from "@react-pdf/renderer";
+import { formatDate } from "../../../helper/date-time-helper";
 
 // Register modern fonts (optional but recommended)
 // Modern Chronological Resume Styles
@@ -137,15 +138,6 @@ const styles = StyleSheet.create({
     color: "#2c3e50",
   },
 });
-
-// Helper: Format dates
-const formatDate = (date: Date | null) =>
-  date
-    ? new Date(date).toLocaleDateString("en-US", {
-        month: "short",
-        year: "numeric",
-      })
-    : "Present";
 
 // Chronological Resume Template
 const ModernChronologicalTemplate: React.FC<{ resume: any }> = ({ resume }) => (
@@ -335,11 +327,5 @@ const ModernChronologicalTemplate: React.FC<{ resume: any }> = ({ resume }) => (
     </Page>
   </Document>
 );
-
-// Add to template map
-const templateMap: Record<string, React.FC<{ resume: any }>> = {
-  "modern-chronological": ModernChronologicalTemplate,
-  // ...other templates
-};
 
 export default ModernChronologicalTemplate;

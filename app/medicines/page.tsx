@@ -40,75 +40,83 @@ const MedicinesPage: React.FC = () => {
   const { theme, toggleTheme } = useThemeStore();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenAddModel, setIsOpenAddModel] = useState(false);
-    const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
+  const [isDeletePopupOpen, setIsDeletePopupOpen] = useState(false);
 
-  const { mutate: createMedicine, isLoading:isLoadingCreate } = useCreateMedicine();
+  const { mutate: createMedicine, isLoading: isLoadingCreate } =
+    useCreateMedicine();
   const { mutate: deleteManyMedicines } = useDeleteManyMedicines();
 
   const [form, setForm] = useState({
-    name: '',
-    manufacturer: '',
-    expiryDate: '',
-    dosage: '',
+    name: "",
+    manufacturer: "",
+    expiryDate: "",
+    dosage: "",
     price: 0,
     quantityInStock: 0,
-    supplier: '',
-    category: '',
-    description: '',
-    dosageForm: '',
+    supplier: "",
+    category: "",
+    description: "",
+    dosageForm: "",
     packSize: 0,
-    sideEffects: '',
+    sideEffects: "",
     prescriptionRequired: false,
   });
-   const [supplierCurr, setSupplierCurr] = useState("");
+  const [supplierCurr, setSupplierCurr] = useState("");
   const { data: suppliers, error } = useAllSuppliers();
   const options =
     suppliers?.map((r) => ({
       label: r.name,
       value: r._id,
     })) || [];
-  const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChangeInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'quantityInStock' || name === 'packSize'
-        ? Number(value)
-        : value,
+      [name]:
+        name === "price" || name === "quantityInStock" || name === "packSize"
+          ? Number(value)
+          : value,
     }));
   };
-const handleBulkDelete = () => {
-  deleteManyMedicines(Array.from(selectedRows).map(e=>e.id), {
-    onSuccess: () => {
-      refetchSearch(); // <- Call search after deletion
-    },
-    onError: (error) => {
-      console.error('Failed to delete medicines:', error);
-    },
-  });
-  setIsDeletePopupOpen(false);
-};
+  const handleBulkDelete = () => {
+    deleteManyMedicines(
+      Array.from(selectedRows).map((e) => e.id),
+      {
+        onSuccess: () => {
+          refetchSearch(); // <- Call search after deletion
+        },
+        onError: (error) => {
+          console.error("Failed to delete medicines:", error);
+        },
+      }
+    );
+    setIsDeletePopupOpen(false);
+  };
   const handleSubmit = () => {
     const dataToSend = {
       ...form,
-      supplier:supplierCurr,
-      sideEffects: form.sideEffects.split(',').map(s => s.trim()), // comma-separated
+      supplier: supplierCurr,
+      sideEffects: form.sideEffects.split(",").map((s) => s.trim()), // comma-separated
     };
     createMedicine(dataToSend, {
       onSuccess: () => {
-       setIsOpenAddModel(false)
-        setForm({ // reset form
-          name: '',
-          manufacturer: '',
-          expiryDate: '',
-          dosage: '',
+        setIsOpenAddModel(false);
+        setForm({
+          // reset form
+          name: "",
+          manufacturer: "",
+          expiryDate: "",
+          dosage: "",
           price: 0,
           quantityInStock: 0,
-          supplier: '',
-          category: '',
-          description: '',
-          dosageForm: '',
+          supplier: "",
+          category: "",
+          description: "",
+          dosageForm: "",
           packSize: 0,
-          sideEffects: '',
+          sideEffects: "",
           prescriptionRequired: false,
         });
         handleSearch();
@@ -212,23 +220,23 @@ const handleBulkDelete = () => {
       filterable: true,
       type: "text",
       reorderable: true,
-      render: (value, row) =>{
+      render: (value, row) => {
         const toggleDrawer = () => setIsOpen((prev) => !prev);
-      
+
         const drawerItems = [
           { label: "Home", onClick: () => alert("Home clicked") },
           { label: "Profile", onClick: () => alert("Profile clicked") },
           { label: "Settings", onClick: () => alert("Settings clicked") },
-        ]; return(
-        
+        ];
+        return (
           <>
             <button
               onClick={toggleDrawer}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
             >
-             {row.supplier?.name}
+              {row.supplier?.name}
             </button>
-  
+
             <Drawer
               isOpen={isOpen}
               onClose={toggleDrawer}
@@ -238,9 +246,9 @@ const handleBulkDelete = () => {
               {SupplierCard(row.supplier)}
             </Drawer>
           </>
-        ) } 
+        );
+      },
     },
-
   ];
   const darkMode = useMemo(() => {
     return theme === "dark";
@@ -302,37 +310,35 @@ const handleBulkDelete = () => {
       supplier: "",
     };
     setFilters(emptyFilters);
-    refetchSearch(); // Trigger fetch to load all medicines
+    refetchSearch();
   };
   const [initialColumnWidths, setInitialColumnWidths] = useState({
-    checkbox: 50, // Checkbox for selection
-    name: 140, // Medicine name (Primary field)
-    manufacturer: 180, // Manufacturer name
-    expiryDate: 160, // Expiry Date
-    dosage: 120, // Dosage information
-    price: 120, // Price in $
-    quantityInStock: 120, // Stock quantity
-    packSize: 100, // Pack size
-    sideEffects: 200, // Side effects (comma-separated)
-    prescriptionRequired: 160, // Prescription required (Yes/No)
-    supplier: 180, // Supplier name
-    actions: 100, // Actions column
+    checkbox: 50,
+    name: 240,
+    manufacturer: 200,
+    expiryDate: 200,
+    dosage: 200,
+    price: 130,
+    quantityInStock: 130,
+    packSize: 110,
+    sideEffects: 200,
+    prescriptionRequired: 160,
+    supplier: 200,
   });
 
   const handleSelectedRowsChange = (newSelectedRows: Set<any>) => {
-   
     setSelectedRows(newSelectedRows);
   };
-  useEffect(()=>{
-    console.log(Array.from(selectedRows).length===0)
-  },[selectedRows])
+  useEffect(() => {
+    console.log(Array.from(selectedRows).length === 0);
+  }, [selectedRows]);
   const [editedRows, setEditedRows] = useState<
     { rowIndex: number; before: any; after: any }[]
   >([]);
   const dataTable = useMemo<MedicineMapped[]>(() => {
     if (!medicinesData) return [];
     return medicinesData.map((medicine) => ({
-      id:medicine._id,
+      id: medicine._id,
       name: medicine.name,
       manufacturer: medicine.manufacturer,
       expiryDate: medicine.expiryDate,
@@ -352,9 +358,9 @@ const handleBulkDelete = () => {
     setEditedRows((prev) => [...prev, { rowIndex, before, after }]);
     console.log(`Row ${rowIndex} edited:`, { before, after });
   };
-  useEffect(()=>{
-    refetchSearch()
-  },[])
+  useEffect(() => {
+    refetchSearch();
+  }, []);
   return (
     <div
       className={`max-w-9xl min-h-[1000px] mx-auto p-6  shadow-md ${
@@ -407,9 +413,9 @@ const handleBulkDelete = () => {
         </div>
 
         <div className="flex justify-end gap-4">
-            <button
-            onClick={()=>setIsDeletePopupOpen(true)}
-            disabled={Array.from(selectedRows).length==0}
+          <button
+            onClick={() => setIsDeletePopupOpen(true)}
+            disabled={Array.from(selectedRows).length == 0}
             className="bg-red-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition-colors flex flex-row gap-2 items-center"
           >
             <HiMiniTrash />
@@ -456,7 +462,15 @@ const handleBulkDelete = () => {
           Failed to fetch medicines.
         </p>
       )}
+      <div className={`flex items-center w-full my-2 `}>
+        <hr className="flex-grow border-gray-300" />
 
+        <span className="mx-4 text-2xl text-bold text-gray-500 whitespace-nowrap">
+          Inventory
+        </span>
+
+        <hr className="flex-grow border-gray-300" />
+      </div>
       {/* Data Table */}
       <div
         className={`overflow-x-auto shadow-md rounded-lg max-h-[820px] ${
@@ -470,86 +484,98 @@ const handleBulkDelete = () => {
           setSelectedRows={setSelectedRows}
           columnWidths={initialColumnWidths}
           onEdit={handleEdit}
-             focusedRowData={focusedRowData}
-            setFocusedRowData={setFocusedRowData}
+          focusedRowData={focusedRowData}
+          setFocusedRowData={setFocusedRowData}
         />
       </div>
       <Popup
-      isOpen={isOpenAddModel}
-      onClose={() => setIsOpenAddModel(false)}
-      title="Add New Medicine"
-      width="w-[800px]"
-      maxNestedDepth={0}
-    >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Name</label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-            placeholder="Enter medicine name"
-          />
-        </div>
+        isOpen={isOpenAddModel}
+        onClose={() => setIsOpenAddModel(false)}
+        title="Add New Medicine"
+        width="w-[800px]"
+        maxNestedDepth={0}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+              placeholder="Enter medicine name"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Manufacturer</label>
-          <input
-            name="manufacturer"
-            value={form.manufacturer}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-            placeholder="Enter manufacturer"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Manufacturer
+            </label>
+            <input
+              name="manufacturer"
+              value={form.manufacturer}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+              placeholder="Enter manufacturer"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Expiry Date</label>
-          <input
-            type="date"
-            name="expiryDate"
-            value={form.expiryDate}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Expiry Date
+            </label>
+            <input
+              type="date"
+              name="expiryDate"
+              value={form.expiryDate}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Dosage</label>
-          <input
-            name="dosage"
-            value={form.dosage}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-            placeholder="e.g., 500mg"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Dosage
+            </label>
+            <input
+              name="dosage"
+              value={form.dosage}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+              placeholder="e.g., 500mg"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Price</label>
-          <input
-            type="number"
-            name="price"
-            value={form.price}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Price
+            </label>
+            <input
+              type="number"
+              name="price"
+              value={form.price}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Quantity in Stock</label>
-          <input
-            type="number"
-            name="quantityInStock"
-            value={form.quantityInStock}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Quantity in Stock
+            </label>
+            <input
+              type="number"
+              name="quantityInStock"
+              value={form.quantityInStock}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+            />
+          </div>
 
-        <div>
-          <CustomSelect
+          <div>
+            <CustomSelect
               label="Supllier"
               value={supplierCurr}
               onChange={setSupplierCurr}
@@ -557,121 +583,134 @@ const handleBulkDelete = () => {
               placeholder="Choose role"
               //error={error}
             />
-        </div>
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Category</label>
-          <input
-            name="category"
-            value={form.category}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Category
+            </label>
+            <input
+              name="category"
+              value={form.category}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Dosage Form</label>
-          <input
-            name="dosageForm"
-            value={form.dosageForm}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Dosage Form
+            </label>
+            <input
+              name="dosageForm"
+              value={form.dosageForm}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Pack Size</label>
-          <input
-            type="number"
-            name="packSize"
-            value={form.packSize}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Pack Size
+            </label>
+            <input
+              type="number"
+              name="packSize"
+              value={form.packSize}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+            />
+          </div>
 
-        <div>
-          <label className="block mb-2 text-sm font-medium text-gray-700">Side Effects (comma-separated)</label>
-          <input
-            name="sideEffects"
-            value={form.sideEffects}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-            placeholder="e.g., headache, nausea"
-          />
-        </div>
+          <div>
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Side Effects (comma-separated)
+            </label>
+            <input
+              name="sideEffects"
+              value={form.sideEffects}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+              placeholder="e.g., headache, nausea"
+            />
+          </div>
 
-        <div className="flex items-center gap-2 mt-2">
-          <input
-            type="checkbox"
-            id="prescriptionRequired"
-            checked={form.prescriptionRequired}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                prescriptionRequired: e.target.checked,
-              }))
-            }
-          />
-          <label htmlFor="prescriptionRequired" className="text-sm font-medium text-gray-700">
-            Prescription Required
-          </label>
-        </div>
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="prescriptionRequired"
+              checked={form.prescriptionRequired}
+              onChange={(e) =>
+                setForm((prev) => ({
+                  ...prev,
+                  prescriptionRequired: e.target.checked,
+                }))
+              }
+            />
+            <label
+              htmlFor="prescriptionRequired"
+              className="text-sm font-medium text-gray-700"
+            >
+              Prescription Required
+            </label>
+          </div>
 
-        <div className="sm:col-span-2">
-          <label className="block mb-2 text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChangeInput}
-            className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
-            placeholder="Enter description"
-          />
-        </div>
+          <div className="sm:col-span-2">
+            <label className="block mb-2 text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={form.description}
+              onChange={handleChangeInput}
+              className="w-full px-4 py-2 border rounded-lg text-sm focus:outline-none border-gray-300"
+              placeholder="Enter description"
+            />
+          </div>
 
-        <div className="col-span-2 flex justify-end mt-1">
-          <button
-            onClick={handleSubmit}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Medicine
-          </button>
+          <div className="col-span-2 flex justify-end mt-1">
+            <button
+              onClick={handleSubmit}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Create Medicine
+            </button>
+          </div>
         </div>
-      </div>
-    </Popup>
-    <Popup
-  isOpen={isDeletePopupOpen}
-  onClose={() => setIsDeletePopupOpen(false)}
-  title="Confirm Delete"
-  width="w-[400px]"
-  maxNestedDepth={0}
->
-  <div className="p-4">
-    <p className="mb-6">
-      Are you sure you want to delete{' '}
-      <span className="font-semibold"></span>? This action cannot be undone.
-    </p>
-
-    <div className="flex justify-end gap-4">
-      <button
-        onClick={() => setIsDeletePopupOpen(false)}
-        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+      </Popup>
+      <Popup
+        isOpen={isDeletePopupOpen}
+        onClose={() => setIsDeletePopupOpen(false)}
+        title="Confirm Delete"
+        width="w-[400px]"
+        maxNestedDepth={0}
       >
-        Cancel
-      </button>
+        <div className="p-4">
+          <p className="mb-6">
+            Are you sure you want to delete{" "}
+            <span className="font-semibold"></span>? This action cannot be
+            undone.
+          </p>
 
-      <button
-        onClick={() => {
-         handleBulkDelete()
-        }}
-        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-      >
-        Delete
-      </button>
-    </div>
-  </div>
-</Popup>
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={() => setIsDeletePopupOpen(false)}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
 
+            <button
+              onClick={() => {
+                handleBulkDelete();
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </Popup>
     </div>
   );
 };

@@ -382,16 +382,5 @@ const ModernTemplate01: React.FC<{ resume: any }> = ({ resume }) => (
   </Document>
 );
 
-// Main component with template selection
-const BaseResumePdf: React.FC<{ resume: any }> = ({ resume }) => {
-  const templateMap: Record<string, React.FC<{ resume: any }>> = {
-    "modern-template-01": ModernTemplate01,
-    // Add other templates here as needed
-  };
 
-  const Template = templateMap[resume.template] || ModernTemplate01;
-
-  return <Template resume={resume} />;
-};
-
-export default BaseResumePdf;
+export default ModernTemplate01;

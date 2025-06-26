@@ -18,7 +18,7 @@ import {
   FiSearch,
   FiMoreVertical,
 } from "react-icons/fi";
-import { Menu, Transition } from "@headlessui/react";
+import { Menu, MenuButton, MenuItems, Transition } from "@headlessui/react";
 import { clsx } from "clsx";
 import { EmptyState } from "./EmptyState";
 import TableFooter from "./Footer";
@@ -229,37 +229,37 @@ const filteredData = useMemo(() =>
       ))
   ), [editedData, filters, columns, globalSearch]);
 
-  // Export to CSV
-  const exportToCSV = () => {
-    const csvContent = [
-      // Join the column labels
-      columns.map((c) => c.label).join(","),
+const exportToCSV = () => {
+  const filename = "data.csv"
+  if (!columns || !sortedData) {
+    console.warn("No data or columns to export.");
+    return;
+  }
 
-      // Map through the rows and join values
-      ...sortedData.map((row) =>
-        columns
-          .map(
-            (c) =>
-              // Use the correct template literal to replace quotes in cell data
-              `"${String(row[c.key]).replace(/"/g, '""')}"`
-          )
-          .join(",")
-      ),
-    ].join("\n");
-
-    // Create a Blob with the CSV content
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-
-    // Create an anchor element to trigger the download
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "data.csv";
-    a.click();
-
-    // Clean up
-    window.URL.revokeObjectURL(url);
+  const escapeCSV = (value: any): string => {
+    const str = String(value ?? "");
+    return `"${str.replace(/"/g, '""')}"`;
   };
+
+  const headerRow = columns.map(col => escapeCSV(col.label)).join(",");
+  const dataRows = sortedData.map(row =>
+    columns.map(col => escapeCSV(row[col.key])).join(",")
+  );
+  const csvContent = [headerRow, ...dataRows].join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
 
 const sortedData = useMemo(() =>
   sortColumn
@@ -310,7 +310,6 @@ const groupedData = useMemo(() =>
     );
   };
 
-  // Loading skeleton
   const renderLoadingRows = () =>
     Array.from({ length: rowsPerPage }).map((_, i) => (
       <tr key={i} className="animate-pulse">
@@ -364,7 +363,7 @@ const groupedData = useMemo(() =>
 
           {/* Column Settings Dropdown */}
           <Menu as="div" className="relative">
-            <Menu.Button
+            <MenuButton
               className={clsx(
                 "flex items-center space-x-2 px-4 py-2.5 text-sm font-medium border rounded-xl transition-colors duration-200",
                 isDark
@@ -375,7 +374,7 @@ const groupedData = useMemo(() =>
               <FiSettings className="w-4 h-4" />
               <span>Columns</span>
               <FiChevronDown className="w-4 h-4 transition-transform ui-open:rotate-180" />
-            </Menu.Button>
+            </MenuButton>
 
             <Transition
               enter="transition ease-out duration-100"
@@ -385,7 +384,7 @@ const groupedData = useMemo(() =>
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Menu.Items
+              <MenuItems
                 className={clsx(
                   "absolute right-0 mt-2 w-56 border rounded-lg shadow-lg ring-1 focus:outline-none z-50",
                   isDark
@@ -435,7 +434,7 @@ const groupedData = useMemo(() =>
                     </Menu.Item>
                   ))}
                 </div>
-              </Menu.Items>
+              </MenuItems>
             </Transition>
           </Menu>
 
@@ -692,7 +691,7 @@ const groupedData = useMemo(() =>
                   isTextOverflowing={isTextOverflowing}
                   cellRefs={cellRefs}
                   collapsedGroups={collapsedGroups}
-                  mode="light" // or "dark" depending on the theme
+                  mode="light"
                   focusedRowIndex={focusedRowIndex}
                   setFocusedRowIndex={setFocusedRowIndex}
                   setFocusedRowData={setFocusedRowData}
@@ -713,7 +712,6 @@ const groupedData = useMemo(() =>
         filteredDataLength={filteredData.length}
         rowsPerPage={rowsPerPage}
         selectedRows={selectedRows}
-          
   setRowsPerPage={setRowsPerPage}
         setSelectedRows={() => {
           setSelectedRows?.(new Set());
